@@ -66,15 +66,16 @@ export default function TechHackathons() {
         ← Go Back
       </button>
 
-      <section className="relative min-h-screen flex items-center justify-center">
+      <section className="relative min-h-screen flex items-center justify-center px-4">
         <div className="absolute inset-0 opacity-20">
           <ImageWithFallback src={techImage} alt="Tech workspace" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-black via-green-950/30 to-black" />
         </div>
-        <div className="relative z-10 text-center px-4 max-w-6xl">
-          <h1 className="text-6xl md:text-8xl lg:text-9xl mb-8 leading-none terminal-glow font-bold">48 hours.</h1>
-          <p className="text-3xl md:text-5xl text-green-300 italic">That's enough to build something real.</p>
-          <div className="mt-16 inline-block text-left bg-black/80 border border-green-500/50 p-2 rounded shadow-2xl shadow-green-500/20">
+        <div className="relative z-10 text-center max-w-5xl">
+          <p className="text-sm uppercase tracking-[0.3em] text-green-400 mb-6 font-sans">Tech &amp; Hackathons</p>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl mb-6 leading-none terminal-glow font-bold">48 hours.</h1>
+          <p className="text-xl md:text-2xl text-green-300 italic">That's enough to build something real.</p>
+          <div className="mt-12 inline-block text-left bg-black/80 border border-green-500/50 p-2 rounded shadow-2xl shadow-green-500/20">
             <div className="flex items-center gap-2 bg-green-950/50 px-3 py-1 border-b border-green-500/30">
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
@@ -89,17 +90,7 @@ export default function TechHackathons() {
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-black to-green-950/10">
-        <div className="max-w-4xl space-y-8 text-green-300">
-          <p className="text-2xl">Dark hostel room.</p>
-          <p className="text-2xl">Laptop glow only light source.</p>
-          <p className="text-2xl">Rain outside window.</p>
-          <p className="text-2xl">Discord sounds.</p>
-          <p className="text-2xl terminal-glow">Terminal logs moving in real-time.</p>
-        </div>
-      </section>
-
-      <section className="min-h-screen flex items-center justify-center px-4">
+      <section className="py-24 px-4 flex items-center justify-center">
         <div className="w-full max-w-4xl">
           <div className="bg-black border-2 border-green-500/50 rounded-lg shadow-2xl shadow-green-500/30 overflow-hidden">
             <div className="flex items-center gap-2 bg-green-950/50 px-4 py-2 border-b border-green-500/30">
@@ -130,10 +121,13 @@ export default function TechHackathons() {
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-black to-green-950/20">
-        <div className="max-w-6xl">
-          <h3 className="text-4xl md:text-6xl mb-16 text-center terminal-glow font-bold">WHAT YOU'RE ACTUALLY BUILDING</h3>
-          <div className="space-y-8">
+      <section className="py-24 px-4 bg-gradient-to-b from-black to-green-950/20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.3em] text-green-400 mb-3 font-sans">The Briefs</p>
+            <h3 className="text-3xl md:text-5xl terminal-glow font-bold">What you're actually building</h3>
+          </div>
+          <div className="space-y-6">
             {[
               { e: '🏗️', t: 'A manufacturing dashboard replacing a ₹40L workflow' },
               { e: '🧬', t: 'A rural health tool replacing paper tracking' },
@@ -141,52 +135,51 @@ export default function TechHackathons() {
             ].map((it, i) => (
               <div key={i} className="bg-black border border-green-500/30 p-8 rounded-2xl hover:border-green-500 transition-all hover:shadow-lg hover:shadow-green-500/20">
                 <span className="text-4xl mb-4 block">{it.e}</span>
-                <p className="text-2xl text-green-300">{it.t}</p>
+                <p className="text-lg md:text-xl text-green-300">{it.t}</p>
               </div>
             ))}
           </div>
-          <p className="text-2xl text-green-400/70 mt-12 text-center font-sans">Three industries. Same 48 hours. Same chai.</p>
+          <p className="text-lg text-green-400/70 mt-10 text-center font-sans">Three industries. Same 48 hours. Same chai.</p>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-4xl space-y-16">
-          <h3 className="text-5xl md:text-7xl terminal-glow font-bold">WHAT THIS DOES TO YOU</h3>
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <h3 className="text-3xl md:text-5xl terminal-glow font-bold">What this does to you</h3>
           <div className="space-y-8 font-sans">
             <div className="border-l-4 border-green-500 pl-8">
-              <p className="text-3xl mb-2">🛠️</p>
-              <p className="text-2xl text-green-300">You stop being someone who codes.</p>
-              <p className="text-2xl text-green-400 terminal-glow">You become someone who ships.</p>
+              <p className="text-2xl mb-2">🛠️</p>
+              <p className="text-lg md:text-xl text-green-300">You stop being someone who codes.</p>
+              <p className="text-lg md:text-xl text-green-400 terminal-glow">You become someone who ships.</p>
             </div>
             <div className="border-l-4 border-green-500 pl-8">
-              <p className="text-3xl mb-2">🔓</p>
-              <p className="text-2xl text-green-300">Your GitHub starts looking more valuable than your résumé.</p>
+              <p className="text-2xl mb-2">🔓</p>
+              <p className="text-lg md:text-xl text-green-300">Your GitHub starts looking more valuable than your résumé.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-black">
-        <div className="text-center max-w-4xl">
+      <section className="py-24 px-4 bg-black flex items-center justify-center">
+        <div className="text-center max-w-2xl">
           <div className="inline-block text-left bg-black/80 border border-green-500/50 p-8 rounded shadow-2xl shadow-green-500/30">
-            <p className="text-green-400 text-2xl mb-4">[SUCCESS]</p>
-            <div className="h-8" />
-            <p className="text-green-400 text-4xl terminal-glow">Build complete.</p>
+            <p className="text-green-400 text-lg mb-3">[SUCCESS]</p>
+            <p className="text-green-400 text-3xl md:text-4xl terminal-glow font-bold">Build complete.</p>
           </div>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-black to-green-950">
-        <div className="text-center font-sans">
+      <section className="py-24 px-4 bg-gradient-to-b from-black to-green-950">
+        <div className="text-center font-sans max-w-2xl mx-auto">
           <button
             data-testid="cta-primary"
             onClick={() => navigate('/')}
-            className="bg-green-600 hover:bg-green-700 text-black text-2xl md:text-3xl px-12 md:px-16 py-6 md:py-8 rounded-full transition-all hover:scale-105 shadow-2xl shadow-green-500/50 terminal-glow font-bold"
+            className="bg-green-600 hover:bg-green-700 text-black text-xl md:text-2xl px-12 py-6 rounded-full transition-all hover:scale-105 shadow-2xl shadow-green-500/50 terminal-glow font-bold"
           >
             Start the clock. →
           </button>
           <p className="text-green-400/50 mt-8">or</p>
-          <button onClick={() => navigate('/')} className="text-green-400/70 hover:text-green-400 transition-colors mt-4 text-lg">
+          <button onClick={() => navigate('/')} className="text-green-400/70 hover:text-green-400 transition-colors mt-4 text-base">
             Return to opportunities
           </button>
         </div>

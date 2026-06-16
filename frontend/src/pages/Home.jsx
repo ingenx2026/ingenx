@@ -12,8 +12,9 @@ import groupDiscussion from '../imports/image-3.png';
 import stagePresentation from '../imports/image-8.png';
 import winningMoment from '../imports/image-5.png';
 import certificateImage from '../imports/image-6.png';
-import logoImage from '../imports/image-11.png';
+import logoImage from '../imports/ingenuityx-logo.jpg';
 import mascotImage from '../imports/image-12.png';
+import rhinoMascot from '../imports/rhino-mascot.png';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -28,6 +29,8 @@ export default function Home() {
   const [newSubmission, setNewSubmission] = useState('');
   const [showSubmitMessage, setShowSubmitMessage] = useState(false);
   const [activeDidYouKnow, setActiveDidYouKnow] = useState(null);
+  const [heroFactIndex, setHeroFactIndex] = useState(0);
+  const [showHeroFact, setShowHeroFact] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
@@ -56,6 +59,19 @@ export default function Home() {
     }, 20000);
     return () => clearInterval(interval);
   }, [heroSlides.length]);
+
+  // Rotating "Did you know?" popups in hero
+  useEffect(() => {
+    const show = setTimeout(() => setShowHeroFact(true), 3500);
+    const rotator = setInterval(() => {
+      setShowHeroFact(false);
+      setTimeout(() => {
+        setHeroFactIndex((p) => (p + 1) % 6);
+        setShowHeroFact(true);
+      }, 600);
+    }, 9000);
+    return () => { clearTimeout(show); clearInterval(rotator); };
+  }, []);
 
   const handleWallSubmit = (e) => {
     e.preventDefault();
@@ -182,6 +198,11 @@ export default function Home() {
       id: 5,
       text: "The average resume gets 6–7 seconds of HR attention in the first pass. Six. Seconds. The real screening happens in the conversation after — which means how you talk about your work matters infinitely more than bullet points.",
       tag: "READ THAT AGAIN"
+    },
+    {
+      id: 6,
+      text: "Apple, Google, and several other Fortune 500 companies have officially removed degree requirements from many of their roles. The new currency? Demonstrated ability. Portfolio. Proof of work.",
+      tag: "THE ERA HAS SHIFTED"
     }
   ];
 
@@ -365,10 +386,38 @@ export default function Home() {
           50% { box-shadow: 0 0 40px rgba(255, 87, 34, 0.8); }
         }
         .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        @keyframes rhino-float {
+          0%, 100% { transform: translateY(0) rotate(-2deg); }
+          50% { transform: translateY(-14px) rotate(2deg); }
+        }
+        .rhino-float { animation: rhino-float 4s ease-in-out infinite; }
+        @keyframes fact-in {
+          from { opacity: 0; transform: translate(-50%, 12px) scale(0.96); }
+          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        .fact-in { animation: fact-in 0.5s ease-out both; }
       `}</style>
 
       {/* HERO SECTION */}
       <section className="relative h-screen overflow-hidden" data-testid="hero-section">
+        {/* Top-left InGenuityX Logo */}
+        <div className="absolute top-5 left-5 md:top-7 md:left-9 z-30" data-testid="hero-logo">
+          <img
+            src={logoImage}
+            alt="InGenuityX"
+            className="h-12 md:h-16 w-auto object-contain bg-white/95 rounded-lg px-3 py-1 shadow-lg"
+          />
+        </div>
+
+        {/* Top-right floating Rhino mascot */}
+        <div className="absolute top-3 right-3 md:top-5 md:right-7 z-30 pointer-events-none" data-testid="hero-rhino">
+          <img
+            src={rhinoMascot}
+            alt="InGenuityX Rhino"
+            className="h-40 md:h-56 lg:h-64 w-auto object-contain rhino-float drop-shadow-2xl"
+          />
+        </div>
+
         {heroSlides.map((slide, index) => (
           <div
             key={index}
@@ -400,7 +449,7 @@ export default function Home() {
             </div>
           </div>
         ))}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
           {heroSlides.map((_, index) => (
             <button
               key={index}
@@ -413,6 +462,35 @@ export default function Home() {
             />
           ))}
         </div>
+
+        {/* Rotating "Did You Know?" popup in hero */}
+        {showHeroFact && didYouKnows[heroFactIndex] && (
+          <div
+            data-testid="hero-fact-popup"
+            className="fact-in absolute left-1/2 bottom-24 md:bottom-28 z-30 max-w-md w-[92%] md:w-auto bg-gray-900/90 backdrop-blur-md border border-orange-500/40 rounded-2xl p-4 md:p-5 shadow-2xl"
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💡</span>
+              <div className="flex-1 text-left">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-orange-300 mb-1">Did you know?</p>
+                <p className="text-sm md:text-base text-white leading-snug">{didYouKnows[heroFactIndex].text}</p>
+                {didYouKnows[heroFactIndex].source && (
+                  <p className="text-[10px] text-orange-300/80 mt-2">— {didYouKnows[heroFactIndex].source}</p>
+                )}
+                {didYouKnows[heroFactIndex].tag && (
+                  <p className="text-[10px] text-orange-300/80 mt-2">{didYouKnows[heroFactIndex].tag}</p>
+                )}
+              </div>
+              <button
+                onClick={() => setShowHeroFact(false)}
+                className="text-gray-400 hover:text-white text-sm leading-none"
+                aria-label="dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* OPPORTUNITIES BUFFET */}

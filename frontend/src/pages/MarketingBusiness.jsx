@@ -24,6 +24,12 @@ export default function MarketingBusiness() {
     { app: 'Blinkit', text: 'Groceries in 10 minutes', time: '8m ago', color: 'yellow' },
   ];
 
+  const problems = [
+    { e: '🥤', t: '"Why is Gen Z buying our competitor\'s drink?"' },
+    { e: '👟', t: '"How do we make this sneaker brand feel less… uncle?"' },
+    { e: '📱', t: '"10M downloads. Zero loyalty."' }
+  ];
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden" data-testid="marketing-page">
       <style>{`
@@ -56,37 +62,39 @@ export default function MarketingBusiness() {
         ← Go Back
       </button>
 
-      <section className="relative min-h-screen flex items-center justify-center">
+      {/* HERO */}
+      <section className="relative min-h-screen flex items-center justify-center px-4">
         <div className="absolute inset-0 opacity-40">
           <ImageWithFallback src={billboardImage} alt="Marketing campaign" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-black via-red-950/50 to-black" />
         </div>
-        <div className="relative z-10 text-center px-4 max-w-6xl">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl mb-8 leading-none font-bold">
+        <div className="relative z-10 text-center max-w-5xl">
+          <p className="text-sm uppercase tracking-[0.3em] text-red-400 mb-6">Marketing &amp; Business</p>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl mb-8 leading-tight font-bold">
             Duniya ke sabse bade brands ke<br />
             <span className="text-red-500">sabse bade problems.</span>
           </h1>
-          <p className="text-3xl md:text-5xl text-gray-300 italic">Yours to crack.</p>
+          <p className="text-xl md:text-2xl text-gray-300 italic">Yours to crack.</p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-red-900/30 to-transparent pointer-events-none" />
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 relative">
+      {/* SCROLL MOMENT */}
+      <section className="py-24 px-4 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-black via-red-950/20 to-black" />
-        <div className="relative z-10 max-w-5xl">
-          <h2 className="text-6xl md:text-8xl mb-8 font-bold">10M downloads.</h2>
-          <div className="h-32" />
-          <h2 className="text-6xl md:text-8xl text-red-500 font-bold">Zero loyalty.</h2>
-          <p className="text-sm text-gray-500 mt-8">— fintech team, mildly panicking</p>
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-4">
+          <h2 className="text-3xl md:text-5xl font-bold">10M downloads.</h2>
+          <h2 className="text-3xl md:text-5xl text-red-500 font-bold">Zero loyalty.</h2>
+          <p className="text-sm text-gray-500 pt-4">— fintech team, mildly panicking</p>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-4xl w-full space-y-16">
-          <h2 className="text-5xl md:text-7xl font-bold">
+      {/* VOICE NOTE */}
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight">
             "Why is Gen Z buying our <span className="text-red-500">competitor's drink</span>?"
           </h2>
-          <div className="bg-gray-900 border border-red-900/50 p-8 rounded-3xl max-w-md">
+          <div className="bg-gray-900 border border-red-900/50 p-6 rounded-3xl max-w-md">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
                 <span className="text-2xl">🎙️</span>
@@ -100,28 +108,28 @@ export default function MarketingBusiness() {
                 </div>
               </div>
             </div>
-            <p className="text-lg italic">"Guys… the campaign isn't landing."</p>
+            <p className="text-base italic">"Guys… the campaign isn't landing."</p>
           </div>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-black to-red-950/30">
-        <div className="max-w-6xl">
-          <h3 className="text-4xl md:text-6xl mb-16 text-center font-bold">WHAT YOU'RE ACTUALLY SOLVING</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { e: '🥤', t: '"Why is Gen Z buying our competitor\'s drink?"' },
-              { e: '👟', t: '"How do we make this sneaker brand feel less… uncle?"' },
-              { e: '📱', t: '"10M downloads. Zero loyalty."' }
-            ].map((it, i) => (
+      {/* WHAT YOU'RE SOLVING */}
+      <section className="py-24 px-4 bg-gradient-to-b from-black to-red-950/30">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.3em] text-red-400 mb-3">The Briefs</p>
+            <h3 className="text-3xl md:text-5xl font-bold">What you're actually solving</h3>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {problems.map((it, i) => (
               <div key={i} className="bg-gray-900/50 border border-red-900/30 p-8 rounded-2xl hover:border-red-500 transition-all">
                 <span className="text-4xl mb-4 block">{it.e}</span>
-                <p className="text-xl">{it.t}</p>
+                <p className="text-lg md:text-xl">{it.t}</p>
               </div>
             ))}
           </div>
-          <p className="text-2xl text-gray-400 mt-12 text-center">
-            Three industries. Same chaos:<br />
+          <p className="text-lg md:text-xl text-gray-400 mt-12 text-center">
+            Three industries. Same chaos:{' '}
             <span className="text-white">attention is harder to earn now.</span>
           </p>
         </div>
@@ -147,41 +155,44 @@ export default function MarketingBusiness() {
         </div>
       )}
 
-      <section className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-4xl space-y-16">
-          <h3 className="text-5xl md:text-7xl font-bold">WHAT THIS DOES TO YOU</h3>
+      {/* WHAT THIS DOES TO YOU */}
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <h3 className="text-3xl md:text-5xl font-bold">What this does to you</h3>
           <div className="space-y-8">
             <div className="border-l-4 border-red-500 pl-8">
-              <p className="text-3xl mb-2">🧠</p>
-              <p className="text-2xl">You stop seeing brands as logos.</p>
-              <p className="text-xl text-gray-400">You start seeing psychology, culture & behaviour everywhere.</p>
+              <p className="text-2xl mb-2">🧠</p>
+              <p className="text-lg md:text-xl">You stop seeing brands as logos.</p>
+              <p className="text-base md:text-lg text-gray-400">You start seeing psychology, culture &amp; behaviour everywhere.</p>
             </div>
             <div className="border-l-4 border-red-500 pl-8">
-              <p className="text-3xl mb-2">🌍</p>
-              <p className="text-2xl">You build a point of view people remember.</p>
+              <p className="text-2xl mb-2">🌍</p>
+              <p className="text-lg md:text-xl">You build a point of view people remember.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-black">
-        <div className="text-center max-w-4xl">
-          <p className="text-sm text-gray-600 mb-16">"I didn't get placed here."</p>
-          <h2 className="text-7xl md:text-9xl text-red-500 font-bold">I got obsessed.</h2>
+      {/* CINEMATIC QUOTE */}
+      <section className="py-24 px-4 bg-black">
+        <div className="text-center max-w-3xl mx-auto">
+          <p className="text-sm text-gray-600 mb-6">"I didn't get placed here."</p>
+          <h2 className="text-4xl md:text-6xl text-red-500 font-bold">I got obsessed.</h2>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-black to-red-950">
-        <div className="text-center">
+      {/* CTA */}
+      <section className="py-24 px-4 bg-gradient-to-b from-black to-red-950">
+        <div className="text-center max-w-2xl mx-auto">
           <button
             data-testid="cta-primary"
             onClick={() => navigate('/')}
-            className="bg-red-600 hover:bg-red-700 text-white text-2xl md:text-3xl px-12 md:px-16 py-6 md:py-8 rounded-full transition-all hover:scale-105 pulse-glow"
+            className="bg-red-600 hover:bg-red-700 text-white text-xl md:text-2xl px-12 py-6 rounded-full transition-all hover:scale-105 pulse-glow font-semibold"
           >
             Take the brief. Break it open. →
           </button>
           <p className="text-gray-400 mt-8">or</p>
-          <button onClick={() => navigate('/')} className="text-white/70 hover:text-white transition-colors mt-4 text-lg">
+          <button onClick={() => navigate('/')} className="text-white/70 hover:text-white transition-colors mt-4 text-base">
             Return to opportunities
           </button>
         </div>
