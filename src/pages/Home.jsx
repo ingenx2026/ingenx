@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ImageWithFallback } from '../components/ImageWithFallback';
-import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal, Copy } from 'lucide-react';
+import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal, Copy, Star } from 'lucide-react';
 import Globe from 'react-globe.gl';
 
 // --- MEDIA IMPORTS ---
@@ -25,8 +25,12 @@ import trootechPosterBg from '../imports/Trootech (2).png';
 import ingenxPosterBg from '../imports/IngenX (2).png';
 import evereadyBg from '../imports/eveready.png';
 
-// --- HERO VIDEOS ---
+// --- CREATOR CHALLENGE IMAGES ---
+import creatorImg1 from '../imports/creator\'s challenge.png';
+import creatorImg2 from '../imports/creator\'s challenge 2.png';
+import creatorImg3 from '../imports/creator\'s challenge 3.png';
 
+// --- HERO VIDEOS ---
 import intervie from '../imports/intervie.mp4';
 import preparation2 from '../imports/preparation2.mp4';
 import pizza from '../imports/pizza.mp4';
@@ -85,15 +89,14 @@ const PROCESS_CLIPS = [
   { src: prep, label: '04 / CASE BANAO' },
 ];
 
-// --- HERO HEADLINE HOOKS (moved to module scope — was being re-allocated every render) ---
+// --- HERO HEADLINE HOOKS ---
 const HERO_RED_HOOKS = [
   "sabse bade problems.", "real, unfiltered briefs.", "whiteboard war rooms.", 
   "late-night build sessions.", "mentorship moments.", "campus showdowns.", 
   "massive prize pools.", "your 'I made it' era." 
 ];
 
-// --- FILTER TABS (moved to module scope — was duplicated as two separate
-// inline array literals that could silently drift out of sync) ---
+// --- FILTER TABS ---
 const CATEGORY_FILTERS = ['All', 'Marketing', 'Tech', 'Design', 'Sustainability', 'Innovation'];
 
 // --- MAP DATA ---
@@ -182,7 +185,6 @@ function OutreachGlobe({ onCityClick, selectedCity }) {
     if (globeEl.current) {
       globeEl.current.pointOfView({ lat: 21.5937, lng: 78.9629, altitude: 0.8 }, 2000);
       globeEl.current.controls().enableZoom = false;
-      // Perf: make sure the orbit controls aren't spinning the scene when idle
       globeEl.current.controls().autoRotate = false;
     }
 
@@ -195,7 +197,6 @@ function OutreachGlobe({ onCityClick, selectedCity }) {
       .catch(err => console.error("Error loading GeoJSON", err));
   }, []);
 
-  // Smoothly move the camera when a city is clicked
   useEffect(() => {
     if (selectedCity && globeEl.current) {
       globeEl.current.pointOfView({ lat: selectedCity.lat, lng: selectedCity.lng, altitude: 0.25 }, 1000);
@@ -204,9 +205,6 @@ function OutreachGlobe({ onCityClick, selectedCity }) {
     }
   }, [selectedCity]);
 
-  // Keep globe responsive to window resizes (debounced — resize can fire
-  // dozens of times during a drag, and each one was forcing a full WebGL
-  // canvas resize + re-render, which is one of the heavier perf costs here)
   useEffect(() => {
     let resizeTimeout;
     const handleResize = () => {
@@ -270,12 +268,6 @@ function OutreachGlobe({ onCityClick, selectedCity }) {
 }
 
 // --- CROSSFADE VIDEO PLAYER (perf) ---
-// Renders one <video> per clip, stacked, and only ever toggles opacity/
-// playback between them instead of unmounting. The old approach put a
-// React `key` on a single <video>, which forced React to destroy and
-// recreate the whole DOM node — restarting decode — every few seconds.
-// That was the main source of the periodic stutter. Clips are mounted
-// once and reused, so switching is just an opacity transition.
 function CrossfadeVideoPlayer({ clips, activeIndex, poster, className = '', videoClassName = '' }) {
   const videoRefs = useRef([]);
 
@@ -320,7 +312,7 @@ export default function Home() {
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
   const [openFaq, setOpenFaq] = useState(-1);
   const [heroVideoIndex, setHeroVideoIndex] = useState(0);
-  const [processVideoIndex, setProcessVideoIndex] = useState(0); // NEW: State for process video loop
+  const [processVideoIndex, setProcessVideoIndex] = useState(0); 
   const [selectedCity, setSelectedCity] = useState(null); 
 
   const teaserScrollRef = useRef(null);
@@ -341,7 +333,6 @@ export default function Home() {
     document.getElementById('waitlist-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  // Performant Scroll Listener
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -357,7 +348,6 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- HERO VIDEO ROTATION (8s first, then 4s loop) ---
   useEffect(() => {
     if (heroVideos.length <= 1) return;
 
@@ -378,12 +368,11 @@ export default function Home() {
     };
   }, [heroVideos.length]);
 
-  // --- PROCESS SECTION VIDEO ROTATION (5s loop) ---
   useEffect(() => {
     if (PROCESS_CLIPS.length <= 1) return;
     const processIntervalId = setInterval(() => {
       setProcessVideoIndex((prevIndex) => (prevIndex + 1) % PROCESS_CLIPS.length);
-    }, 5000); // Cycles exactly every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(processIntervalId);
   }, []);
@@ -715,6 +704,70 @@ export default function Home() {
               </ScrollReveal>
             );
           })}
+        </div>
+      </section>
+
+      {/* 3.5. CREATOR'S CHALLENGE */}
+      <section className="relative w-full py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E] overflow-hidden">
+        <ScrollReveal>
+          <div className="mb-10 md:mb-16 text-left md:text-center flex flex-col md:items-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E92A39]/10 border border-[#E92A39]/20 text-[#E92A39] text-[10px] md:text-xs font-black uppercase tracking-widest mb-4">
+              <span className="w-2 h-2 rounded-full bg-[#E92A39] animate-pulse"></span>
+              Special Event
+            </div>
+            <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-3 md:mb-4">
+              The Creator's Challenge
+            </h2>
+            <p className="text-[#A1A1AA] font-bold text-sm md:text-xl max-w-2xl md:mx-auto">
+              Think you can make it go viral? Prove it
+            </p>
+          </div>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {[
+            {
+              title: "Build in Public",
+              desc: "Film it, post it, and let everyone see how you make it happen.",
+              img: creatorImg1,
+              tag: "Stage 01"
+            },
+            {
+              title: "Community Vote",
+              desc: "The internet decides your fate. Rally your audience and let the community elevate the best ideas.",
+              img: creatorImg2,
+              tag: "Stage 02"
+            },
+            {
+              title: "Pitch the Founders",
+              desc: "Top creators take their ideas straight to the people who built the brands.",
+              img: creatorImg3,
+              tag: "Final Boss"
+            }
+          ].map((card, i) => (
+            <ScrollReveal key={i} delay={i * 100} className="group cursor-pointer">
+              <div className="relative h-[400px] md:h-[500px] rounded-[2rem] overflow-hidden bg-[#161616] border border-[#2A2A2E] group-hover:border-[#E92A39]/60 transition-all duration-500 transform md:group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(233,42,57,0.2)]">
+                {/* Background Image & Overlay */}
+                <img src={card.img} alt={card.title} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700 ease-out" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/40 to-transparent"></div>
+                
+                {/* Floating Tag */}
+                <div className="absolute top-6 left-6 z-10">
+                  <span className="bg-[#151515]/80 backdrop-blur-md text-white border border-[#2A2A2E] px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2">
+                    <Star className="w-3 h-3 text-[#E92A39]" /> {card.tag}
+                  </span>
+                </div>
+
+                {/* Animated Text Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-10 transform translate-y-4 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2 tracking-tight group-hover:text-[#E92A39] transition-colors">{card.title}</h3>
+                  <div className="h-0 md:h-auto overflow-hidden md:overflow-visible">
+                    <p className="text-[#A1A1AA] text-sm md:text-base font-bold opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 mt-2">{card.desc}</p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          ))}
         </div>
       </section>
 
