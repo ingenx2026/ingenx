@@ -9,6 +9,13 @@ import Globe from 'react-globe.gl';
 import billboardImage from '../imports/Gemini_Generated_Image_1l2vfz1l2vfz1l2v.png';
 import logoImage from '../imports/ingenuityx-logo.svg';
 
+// --- REGISTRATION JOURNEY IMAGES ---
+import journeyRegister from '../imports/step 1.jpg';
+import journeyBuild from '../imports/step 2.jpg';
+import journeySubmit from '../imports/step 3.jpg';
+import journeyMentorship from '../imports/step new.jpg';
+import journeyFinale from '../imports/step 4.jpg';
+
 // --- LOCAL LOGOS ---
 import nuvocoLogo from '../imports/logo_nuvoco.jpg';
 import srmbLogo from '../imports/srmb.jpg';
@@ -293,6 +300,121 @@ function CrossfadeVideoPlayer({ clips, activeIndex, poster, className = '', vide
         />
       ))}
     </div>
+  );
+}
+
+// --- REGISTRATION TO FINALE ---
+const REGISTRATION_STEPS = [
+  { number: '01', label: 'GET IN THE GAME', title: 'Register. Make it official.', description: 'Create your InGenuityX profile and tell us what you bring to the table. Your journey starts with one simple step: showing up.', image: journeyRegister, alt: 'Participants checking in at the InGenuityX registration desk' },
+  { number: '02', label: 'FIND YOUR CHALLENGE', title: 'Pick a brief. Build your idea.', description: 'Choose a challenge that matches your interests. Read the brief, understand the problem, and turn your first thought into something worth sharing.', image: journeyBuild, alt: 'A student team discussing their challenge with laptops and notes' },
+  { number: '03', label: 'PUT YOUR WORK OUT THERE', title: 'Submit. Let the idea speak.', description: 'Bring your solution together and submit it before the challenge deadline. Follow the brief’s submission guidelines and watch for review and shortlist updates.', image: journeySubmit, alt: 'Participants celebrating the announcement of shortlisted teams' },
+  { number: '04', label: 'MENTORSHIP & GROWTH', title: 'Get Mentored. Grow Your Idea.', description: 'Work with mentors to sharpen your thinking, challenge your assumptions, and strengthen your solution. Turn feedback into a clearer idea and a stronger pitch before the finale.', image: journeyMentorship, alt: 'A mentor guiding a student team around a table with laptops and notebooks' },
+  { number: '05', label: 'THE FINALE', title: 'Own the stage.', description: 'If shortlisted, take your idea into the finale. Present your thinking, answer the tough questions, and show what makes your solution stand out.', image: journeyFinale, alt: 'Finalists presenting their idea to a panel and audience' },
+];
+
+function RegistrationJourney() {
+  const sectionRef = useRef(null);
+  const trackRef = useRef(null);
+  const progressRef = useRef(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = trackRef.current;
+    const rows = [...section.querySelectorAll('.journey-step')];
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = null;
+    section.classList.add('journey-ready');
+
+    const updateProgress = () => {
+      frame = null;
+      const bounds = track.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.7 - bounds.top) / bounds.height));
+      progressRef.current.style.transform = `scaleY(${media.matches ? 1 : progress})`;
+    };
+    const onScroll = () => {
+      if (frame === null) frame = window.requestAnimationFrame(updateProgress);
+    };
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('journey-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    rows.forEach(row => observer.observe(row));
+    updateProgress();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    media.addEventListener('change', onScroll);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      media.removeEventListener('change', onScroll);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return (
+    <section ref={sectionRef} id="registration-journey" aria-labelledby="registration-journey-title" className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
+      <style>{`
+        #registration-journey .journey-timeline { position: relative; margin: 0; padding: 0; list-style: none; }
+        #registration-journey .journey-track { position: absolute; width: 2px; left: 30%; top: 0; bottom: 0; transform: translateX(-50%); background: #2A2A2E; overflow: hidden; }
+        #registration-journey .journey-progress { width: 100%; height: 100%; background: #E92A39; transform: scaleY(0); transform-origin: top; }
+        #registration-journey .journey-step { position: relative; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); align-items: center; padding: 40px 0; perspective: 1400px; }
+        #registration-journey .journey-image { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; padding-left: clamp(32px, 3vw, 48px); transform-origin: left center; }
+        #registration-journey .journey-copy { grid-column: 1; grid-row: 1; min-width: 0; padding: 24px clamp(32px, 3vw, 48px) 24px 0; transform-origin: right center; overflow-wrap: break-word; }
+        #registration-journey .journey-copy h3 { font-size: clamp(22px, 2.5vw, 36px); }
+        #registration-journey .journey-node { position: absolute; left: 30%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: #151515; border: 1px solid #52525B; color: #A1A1AA; font-size: 12px; font-weight: 900; z-index: 1; transition: background .6s, border-color .6s, color .6s, box-shadow .6s; }
+        #registration-journey .journey-image, #registration-journey .journey-copy { opacity: 1; transform: translateX(0) rotateY(0) scale(1); clip-path: inset(0 0 0 0); transition: opacity .85s ease, transform 1.1s cubic-bezier(.16,1,.3,1), clip-path 1.1s cubic-bezier(.16,1,.3,1); }
+        #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-image { opacity: 0; transform: translateX(-36px) rotateY(12deg) scale(.96); clip-path: inset(0 16% 0 0); }
+        #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-copy { opacity: 0; transform: translateX(28px) rotateY(-12deg) scale(.96); clip-path: inset(0 0 0 16%); }
+        #registration-journey .journey-visible .journey-node { background: #E92A39; border-color: #E92A39; color: white; box-shadow: 0 0 0 7px rgba(233,42,57,.1), 0 0 24px rgba(233,42,57,.22); }
+        @media (max-width: 767px) {
+          #registration-journey .journey-track { left: 20px; }
+          #registration-journey .journey-step { grid-template-columns: 40px minmax(0, 1fr); column-gap: 16px; padding: 24px 0; align-items: start; perspective: none; }
+          #registration-journey .journey-node { position: static; transform: none; grid-column: 1; grid-row: 1; justify-self: center; width: 36px; height: 36px; margin-top: 16px; }
+          #registration-journey .journey-image { grid-column: 2; grid-row: 1; padding-left: 0; }
+          #registration-journey .journey-copy { grid-column: 2; grid-row: 2; padding: 24px 0 8px; }
+          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-image,
+          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-copy { transform: translateY(24px) scale(.98); clip-path: inset(0 0 8% 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          #registration-journey .journey-image, #registration-journey .journey-copy, #registration-journey .journey-node { transition: none; }
+          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-image,
+          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-copy { opacity: 1; transform: none; clip-path: none; }
+        }
+      `}</style>
+      <div className="max-w-3xl mb-10 md:mb-16">
+        <p className="text-[#E92A39] text-xs font-black uppercase tracking-[.2em] mb-4">Your journey starts with registration</p>
+        <h2 id="registration-journey-title" className="text-4xl md:text-6xl font-black tracking-tight text-white mb-5">Your Next Move? <span className="text-[#E92A39]">Register.</span></h2>
+        <p className="text-[#A1A1AA] text-base md:text-xl font-semibold max-w-xl">Head to the registration page to create your InGenuityX profile. Start there, then follow the journey from your first brief to the finale.</p>
+        <Link to="/register" className="inline-flex items-center gap-2 mt-6 bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-7 py-4 rounded-full text-sm font-black transition-colors">Go to Registration <ChevronRight className="w-4 h-4" /></Link>
+      </div>
+      <div className="relative">
+        <div ref={trackRef} className="journey-track" aria-hidden="true"><div ref={progressRef} className="journey-progress" /></div>
+        <ol className="journey-timeline">
+          {REGISTRATION_STEPS.map(step => (
+            <li key={step.number} className="journey-step">
+              <figure className="journey-image">
+                <img src={step.image} alt={step.alt} loading="lazy" width="1200" height="750" className="w-full aspect-[8/5] object-contain bg-[#161616] rounded-2xl md:rounded-[2rem] border border-[#2A2A2E] shadow-2xl" />
+              </figure>
+              <span className="journey-node" aria-hidden="true">{step.number}</span>
+              <div className="journey-copy">
+                <p className="text-[#E92A39] text-[10px] md:text-xs font-black uppercase tracking-[.18em] mb-3">Step {step.number} / {step.label}</p>
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white mb-4">{step.title}</h3>
+                <p className="text-[#A1A1AA] text-sm md:text-base lg:text-lg font-semibold leading-relaxed">{step.description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-10 md:mt-16 rounded-2xl border border-[#2A2A2E] bg-[#161616]/80 p-6 md:p-8">
+        <p className="text-xl md:text-2xl font-black text-white">Ready to get started? Create your profile.</p>
+        <Link to="/register" className="inline-flex items-center gap-2 bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-7 py-4 rounded-full text-sm font-black transition-colors">Go to Registration <ChevronRight className="w-4 h-4" /></Link>
+      </div>
+    </section>
   );
 }
 
@@ -591,6 +713,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <RegistrationJourney />
 
       {/* 3. PICK YOUR LANE */}
       <section className="py-12 md:py-16 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
