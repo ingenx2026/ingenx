@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ImageWithFallback } from '../components/ImageWithFallback';
 import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal, Copy } from 'lucide-react';
-import Globe from 'react-globe.gl';
 
 // --- MEDIA IMPORTS ---
 import billboardImage from '../imports/Gemini_Generated_Image_1l2vfz1l2vfz1l2v.png';
 import logoImage from '../imports/ingenuityx-logo.svg';
+import registrationLaunchLogo from '../imports/registration-launch-logo.png';
 
 // --- REGISTRATION JOURNEY IMAGES ---
 import journeyRegister from '../imports/step 1.jpg';
@@ -37,11 +37,10 @@ import creatorImg1 from "../imports/creator's challenge.png";
 
 // --- HERO VIDEOS ---
 import intervie from '../imports/intervie.mp4';
-import preparation2 from '../imports/preparation2.mp4';
+import collaborating from '../imports/collaborating.mp4';
 import prep from '../imports/prep.mp4';
 import chaos from '../imports/chaos.mp4';
 import celebration3 from '../imports/celebration3.mp4';
-import packing from '../imports/packing.mp4';
 
 import img6 from '../imports/img6.jpg';
 import img7 from '../imports/img7.png';
@@ -89,7 +88,7 @@ const REWARD_IMAGES = [
 
 // --- PROCESS SECTION DATA ---
 const PROCESS_CLIPS = [
-  { src: packing, label: '01 / BRIEF PADHO' },
+  { src: collaborating, label: '01 / BRIEF PADHO' },
   { src: intervie, label: '02 / INSIGHT DHUNDO' },
   { src: chaos, label: '03 / FIRST IDEA TODO' },
   { src: prep, label: '04 / CASE BANAO' },
@@ -104,15 +103,6 @@ const HERO_RED_HOOKS = [
 
 // --- FILTER TABS ---
 const CATEGORY_FILTERS = ['All', 'Marketing', 'Tech', 'Design', 'Sustainability', 'Innovation', "The Creator's Challenge"];
-
-// --- MAP DATA ---
-const OUTREACH_CITIES = [
-  { name: "Delhi", lat: 28.6139, lng: 77.2090, companies: ["Nuvoco", "Eveready Industries"] },
-  { name: "Gurugram", lat: 28.4595, lng: 77.0266, companies: ["TrooTech", "Zomato"] },
-  { name: "Pune", lat: 18.5204, lng: 73.8567, companies: ["Tech Mahindra", "Bajaj Auto"] },
-  { name: "Bengaluru", lat: 12.9716, lng: 77.5946, companies: ["IngenX", "Wipro"] },
-  { name: "Kolkata", lat: 22.5726, lng: 88.3639, companies: ["ITC Limited", "SRMB Steel"] }
-];
 
 // --- SCROLL REVEAL ---
 function ScrollReveal({ children, direction = "up", delay = 0, width = "100%", className = "" }) {
@@ -179,99 +169,6 @@ function PinnedCard({ rotate = 0, className = '', children }) {
   );
 }
 
-// --- INTERACTIVE 3D GLOBE COMPONENT ---
-function OutreachGlobe({ onCityClick, selectedCity }) {
-  const globeEl = useRef();
-  const containerRef = useRef();
-  const [dimensions, setDimensions] = useState({ width: 400, height: 400 });
-  const [statesData, setStatesData] = useState([]);
-
-  useEffect(() => {
-    if (globeEl.current) {
-      globeEl.current.pointOfView({ lat: 21.5937, lng: 78.9629, altitude: 0.8 }, 2000);
-      globeEl.current.controls().enableZoom = false;
-      globeEl.current.controls().autoRotate = false;
-    }
-
-    // Fetch India State Borders GeoJSON
-    fetch('https://raw.githubusercontent.com/Subhash9325/GeoJson-Data-of-Indian-States/master/Indian_States')
-      .then(res => res.json())
-      .then(data => {
-         setStatesData(data.features);
-      })
-      .catch(err => console.error("Error loading GeoJSON", err));
-  }, []);
-
-  useEffect(() => {
-    if (selectedCity && globeEl.current) {
-      globeEl.current.pointOfView({ lat: selectedCity.lat, lng: selectedCity.lng, altitude: 0.25 }, 1000);
-    } else if (!selectedCity && globeEl.current) {
-      globeEl.current.pointOfView({ lat: 21.5937, lng: 78.9629, altitude: 0.8 }, 1000);
-    }
-  }, [selectedCity]);
-
-  useEffect(() => {
-    let resizeTimeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        if (containerRef.current) {
-          setDimensions({
-            width: containerRef.current.offsetWidth,
-            height: containerRef.current.offsetHeight
-          });
-        }
-      }, 150);
-    };
-    handleResize();
-    const initialTimeout = setTimeout(handleResize, 100);
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimeout);
-      clearTimeout(initialTimeout);
-    };
-  }, []);
-
-  return (
-    <div ref={containerRef} className="w-full h-full min-h-[350px] md:min-h-[500px] flex items-center justify-center cursor-move">
-      <Globe
-        ref={globeEl}
-        width={dimensions.width}
-        height={dimensions.height}
-        backgroundColor="rgba(0,0,0,0)"
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
-        rendererConfig={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
-        polygonsData={statesData}
-        polygonAltitude={0.005}
-        polygonCapColor="rgba(233, 42, 57, 0.05)"
-        polygonSideColor="rgba(0, 0, 0, 0)"
-        polygonStrokeColor="rgba(233, 42, 57, 0.4)"
-        polygonsTransitionDuration={0}
-        htmlElementsData={OUTREACH_CITIES}
-        htmlElement={d => {
-          const el = document.createElement('div');
-          el.innerHTML = `
-            <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2 group pointer-events-auto cursor-pointer" style="width: 40px; height: 40px;">
-              <div class="absolute w-4 h-4 bg-[#E92A39] rounded-full animate-ping opacity-60"></div>
-              <div class="relative w-2 h-2 bg-[#E92A39] border border-white/50 rounded-full shadow-[0_0_10px_#E92A39]"></div>
-              <div class="absolute top-6 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-[10px] font-black uppercase tracking-widest text-white bg-[#161616]/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#2A2A2E] shadow-2xl z-50">
-                ${d.name}
-              </div>
-            </div>
-          `;
-          el.onclick = (e) => {
-             e.stopPropagation();
-             onCityClick(d);
-          };
-          return el;
-        }}
-        onGlobeClick={() => onCityClick(null)} 
-      />
-    </div>
-  );
-}
-
 // --- CROSSFADE VIDEO PLAYER ---
 function CrossfadeVideoPlayer({ clips, activeIndex, poster, className = '', videoClassName = '' }) {
   const videoRefs = useRef([]);
@@ -300,6 +197,308 @@ function CrossfadeVideoPlayer({ clips, activeIndex, poster, className = '', vide
         />
       ))}
     </div>
+  );
+}
+
+// --- SCROLL-READING INTRO ---
+const PRE_REGISTER_MESSAGE = 'Pre-register to qualify for Opportunities, Invites and Briefs that don’t exist anywhere else';
+const PRE_REGISTER_WORDS = PRE_REGISTER_MESSAGE.split(' ');
+
+function PreRegistrationStatement() {
+  const sectionRef = useRef(null);
+  const [wordsRead, setWordsRead] = useState(0);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateReading = () => {
+      const bounds = sectionRef.current.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.85 - bounds.top) / (window.innerHeight * 0.65)));
+      setWordsRead(media.matches ? PRE_REGISTER_WORDS.length : Math.ceil(progress * PRE_REGISTER_WORDS.length));
+    };
+    updateReading();
+    window.addEventListener('scroll', updateReading, { passive: true });
+    window.addEventListener('resize', updateReading);
+    media.addEventListener('change', updateReading);
+    return () => {
+      window.removeEventListener('scroll', updateReading);
+      window.removeEventListener('resize', updateReading);
+      media.removeEventListener('change', updateReading);
+    };
+  }, []);
+
+  return (
+    <section ref={sectionRef} id="pre-registration-statement" className="relative flex items-center min-h-[70svh] bg-[#0b0b0b] px-6 md:px-12 lg:px-20 py-20 md:py-28">
+      <style>{`
+        #pre-registration-statement .reading-word { color: #525252; transition: color .3s ease; }
+        #pre-registration-statement .reading-word.is-read { color: #fff4e8; }
+        @media (prefers-reduced-motion: reduce) { #pre-registration-statement .reading-word { color: #fff4e8; transition: none; } }
+      `}</style>
+      <h2 aria-label={PRE_REGISTER_MESSAGE} className="max-w-[1200px] mx-auto text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.2] tracking-tight">
+        {PRE_REGISTER_WORDS.map((word, index) => (
+          <span key={index} aria-hidden="true" className={`reading-word ${index < wordsRead ? 'is-read' : ''}`}>{word}{index < PRE_REGISTER_WORDS.length - 1 ? ' ' : ''}</span>
+        ))}
+      </h2>
+    </section>
+  );
+}
+
+// --- REGISTRATION LAUNCH BANNER ---
+function RegistrationLaunchBanner() {
+  const bannerRef = useRef(null);
+  const [launched, setLaunched] = useState(false);
+  const [boosting, setBoosting] = useState(false);
+  const boostTimer = useRef(null);
+  const [motionPaused, setMotionPaused] = useState(false);
+  const [statProgress, setStatProgress] = useState(0);
+
+  useEffect(() => {
+    if (!launched) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setStatProgress(1);
+      return;
+    }
+    const started = Date.now();
+    const timer = window.setInterval(() => {
+      const progress = Math.min(1, (Date.now() - started) / 1200);
+      setStatProgress(1 - Math.pow(1 - progress, 3));
+      if (progress === 1) window.clearInterval(timer);
+    }, 40);
+    return () => window.clearInterval(timer);
+  }, [launched]);
+
+  useEffect(() => () => window.clearTimeout(boostTimer.current), []);
+
+  const moveRocket = event => {
+    if (event.pointerType === 'touch' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    event.currentTarget.style.setProperty('--rocket-x', `${x * 32}px`);
+    event.currentTarget.style.setProperty('--rocket-y', `${y * 24}px`);
+    event.currentTarget.style.setProperty('--rocket-turn', `${x * 7}deg`);
+  };
+  const resetRocket = event => {
+    ['--rocket-x', '--rocket-y', '--rocket-turn'].forEach(property => event.currentTarget.style.removeProperty(property));
+  };
+  const launchRocket = useCallback(() => {
+    if (boostTimer.current !== null) return;
+    setLaunched(true);
+    setBoosting(true);
+    boostTimer.current = window.setTimeout(() => {
+      setBoosting(false);
+      boostTimer.current = null;
+    }, 1600);
+  }, []);
+
+  useEffect(() => {
+    let dwellTimer = null;
+    let fired = false;
+    const clearDwell = () => {
+      window.clearTimeout(dwellTimer);
+      dwellTimer = null;
+    };
+    const checkVisibility = () => {
+      const bounds = bannerRef.current.getBoundingClientRect();
+      const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0));
+      const stayingHere = !document.hidden && visibleHeight >= Math.min(bounds.height, window.innerHeight) * 0.7;
+      if (!stayingHere) {
+        clearDwell();
+        fired = false;
+      } else if (!fired && dwellTimer === null) {
+        dwellTimer = window.setTimeout(() => {
+          dwellTimer = null;
+          fired = true;
+          launchRocket();
+        }, 3000);
+      }
+    };
+    const scheduleCheck = checkVisibility;
+    checkVisibility();
+    window.addEventListener('scroll', scheduleCheck, { passive: true });
+    window.addEventListener('resize', scheduleCheck);
+    document.addEventListener('visibilitychange', checkVisibility);
+    return () => {
+      clearDwell();
+      window.removeEventListener('scroll', scheduleCheck);
+      window.removeEventListener('resize', scheduleCheck);
+      document.removeEventListener('visibilitychange', checkVisibility);
+    };
+  }, [launchRocket]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setLaunched(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.2 });
+    observer.observe(bannerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={bannerRef} id="registration-launch" aria-labelledby="registration-launch-title" className={`registration-launch ${launched ? 'is-launched' : ''} ${boosting ? 'is-boosting' : ''} ${motionPaused ? 'motion-paused' : ''}`}>
+      <style>{`
+        .registration-launch { --launch-cream: #fff4e8; --launch-accent: #ff4b26; background: #0b0b0b; color: #fff4e8; overflow: hidden; position: relative; isolation: isolate; z-index: 70; min-height: 100svh; scroll-margin-top: 0; }
+        .registration-launch::before, .registration-launch::after { content: ''; position: absolute; top: 0; bottom: 0; width: 50%; z-index: 8; background: #fff4e8; pointer-events: none; transform: scaleX(0); }
+        .registration-launch::before { left: 0; transform-origin: left center; }
+        .registration-launch::after { right: 0; transform-origin: right center; background: #171717; }
+        .registration-launch.is-launched::before, .registration-launch.is-launched::after { animation: cohortCurtainOpen 1.1s cubic-bezier(.76,0,.24,1) both; }
+        @keyframes cohortCurtainOpen { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+        .registration-launch .launch-layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); width: 100%; min-height: 100svh; }
+        .registration-launch .launch-art { position: relative; overflow: hidden; min-height: 100svh; }
+        .registration-launch .launch-type { position: absolute; top: 0; left: -20px; right: -20px; color: var(--launch-cream); font-size: clamp(90px, 10vw, 180px); font-weight: 950; line-height: 1.12; letter-spacing: -.065em; user-select: none; opacity: .14; animation: registrationMarquee 32s linear infinite; animation-play-state: paused; }
+        .registration-launch .launch-type-group { display: flex; flex-direction: column; }
+        .registration-launch .launch-type span { display: block; white-space: nowrap; }
+        .registration-launch .launch-type span:nth-child(even) { color: transparent; -webkit-text-stroke: 2px var(--launch-cream); transform: translateX(-45px); }
+        .registration-launch.is-launched .launch-type { animation-play-state: running; }
+        .registration-launch.motion-paused .launch-type { animation-play-state: paused; }
+        .registration-launch .launch-motion-toggle { position: absolute; bottom: 18px; left: 20px; z-index: 4; width: 40px; height: 40px; border: 2px solid #171717; border-radius: 50%; background: #fff4e8; color: #171717; font-weight: 900; cursor: pointer; }
+        .registration-launch .launch-motion-toggle:focus-visible { outline: 3px solid #fff4e8; outline-offset: 3px; }
+        @keyframes registrationMarquee { to { transform: translateY(-50%); } }
+        .registration-launch .launch-sticker { position: absolute; left: 5%; top: 30px; z-index: 3; background: #fff4e8; border: 2px solid #171717; border-radius: 50%; padding: 0 20px; box-shadow: 5px 6px 0 #171717; transform: rotate(-9deg); }
+        .registration-launch .launch-sticker img { display: block; width: 180px; height: 80px; object-fit: cover; }
+        .registration-launch .launch-rocket { display: block; width: 100%; height: 100%; filter: drop-shadow(9px 14px 0 rgba(23,23,23,.16)); }
+        .registration-launch .launch-info { color: #0b0b0b; background: var(--launch-cream); padding: 60px clamp(24px, 2.8vw, 52px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; position: relative; }
+        .registration-launch .launch-info::before { content: ''; position: absolute; top: 0; bottom: 0; left: -17px; width: 18px; background: var(--launch-cream); clip-path: polygon(100% 0, 100% 100%, 0 96%, 100% 90%, 0 84%, 100% 78%, 0 72%, 100% 66%, 0 60%, 100% 54%, 0 48%, 100% 42%, 0 36%, 100% 30%, 0 24%, 100% 18%, 0 12%, 100% 6%, 0 0); }
+        .registration-launch .launch-heading { margin: 0 0 28px; font-size: clamp(36px, 4.1vw, 76px); line-height: .95; font-weight: 950; text-transform: uppercase; letter-spacing: -.035em; }
+        .registration-launch .launch-button { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; max-width: 380px; border: 2px solid #0b0b0b; background: var(--launch-accent); padding: 20px 16px; box-shadow: 6px 6px 0 rgba(11,11,11,.35); color: #0b0b0b; font-size: clamp(15px, 1.4vw, 21px); font-weight: 950; text-transform: uppercase; text-decoration: none; transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s, color .25s; }
+        .registration-launch .launch-button::before { content: ''; position: absolute; inset: 0; z-index: -1; background: #0b0b0b; transform: translateX(-105%) skewX(-12deg); transition: transform .4s cubic-bezier(.16,1,.3,1); }
+        .registration-launch .launch-button:hover, .registration-launch .launch-button:focus-visible { transform: translateY(-5px) rotate(-1deg); color: var(--launch-accent); box-shadow: 9px 11px 0 rgba(11,11,11,.4); }
+        .registration-launch .launch-button:hover::before, .registration-launch .launch-button:focus-visible::before { transform: translateX(0) skewX(0); }
+        .registration-launch .launch-button:active { transform: translate(4px, 5px) scale(.96); box-shadow: 0 0 0 #0b0b0b; }
+        .registration-launch .launch-button:focus-visible { outline: 3px solid #0b0b0b; outline-offset: 7px; }
+        .registration-launch .launch-button span { font-size: 30px; line-height: 1; }
+        .registration-launch.is-launched .launch-rocket { animation: registrationLiftOff 1.25s cubic-bezier(.16,1,.3,1) both; }
+        .registration-launch.is-launched .launch-sticker { animation: registrationSticker .8s .15s cubic-bezier(.34,1.56,.64,1) both; }
+        .registration-launch.is-launched .launch-flame { transform-origin: 145px 315px; animation: registrationFlame .3s 6 alternate ease-in-out; }
+        @keyframes registrationLiftOff { from { opacity: 0; transform: translate(-100px, 190px) rotate(-18deg) scale(.65); } 70% { opacity: 1; transform: translate(4px, -12px) rotate(2deg) scale(1.02); } to { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); } }
+        @keyframes registrationSticker { from { opacity: 0; transform: rotate(-22deg) scale(.55); } to { opacity: 1; transform: rotate(-9deg) scale(1); } }
+        @keyframes registrationFlame { from { transform: scale(.92); } to { transform: scale(1.08); } }
+        .registration-launch .launch-rocket-control { position: absolute; width: 20%; height: 24%; left: 71%; top: 75%; padding: 0; border: 0; background: transparent; cursor: pointer; z-index: 5; transform: translate(var(--rocket-x, 0px), var(--rocket-y, 0px)) rotate(var(--rocket-turn, 0deg)); transition: transform .25s ease-out; -webkit-tap-highlight-color: transparent; }
+        .registration-launch .launch-rocket-control:focus-visible { outline: 3px dashed #171717; outline-offset: -10px; border-radius: 40%; }
+        .registration-launch .launch-button span { transition: transform .25s; }
+        .registration-launch .launch-button:hover span { transform: translate(5px, -5px); }
+        .registration-launch.is-boosting .launch-rocket { animation: registrationBoost 1.6s cubic-bezier(.4,0,.2,1) both; }
+        .registration-launch.is-boosting .launch-flame { animation: registrationFlame .12s 12 alternate; }
+        @keyframes registrationBoost { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 18% { transform: translate(-18px, 22px) scale(.94); opacity: 1; } 52% { transform: translate(80%, -110%) scale(.7); opacity: 0; } 53% { transform: translate(-65%, 95%) scale(.7); opacity: 0; } 72% { opacity: 1; } 100% { transform: translate(0, 0) scale(1); opacity: 1; } }
+        .registration-launch .launch-info::before { display: none; }
+        .registration-launch .launch-info { border-left: 2px solid #171717; }
+        .registration-launch .launch-edition { margin: 0 0 42px; font-size: 11px; font-weight: 900; letter-spacing: .15em; border-bottom: 2px solid #171717; padding-bottom: 14px; width: 100%; }
+        .registration-launch .launch-heading em { color: var(--launch-accent); font-style: normal; text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 7px; }
+        .registration-launch .launch-one-liner { margin: 0 0 10px; font-size: clamp(20px, 1.8vw, 28px); line-height: 1.15; font-weight: 900; }
+        .registration-launch .launch-subline { margin: 0 0 36px; font-size: 15px; line-height: 1.5; font-weight: 600; }
+        .registration-launch .launch-footnote { margin: 22px 0 0; font-size: 12px; font-weight: 700; }
+        .registration-launch .launch-collage { position: absolute; inset: 0; }
+        .registration-launch .launch-photo { position: absolute; margin: 0; padding: 10px 10px 0; background: #101010; color: #fff4e8; border: 1px solid #fff4e8; box-shadow: 7px 10px 0 rgba(23,23,23,.15); transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s; }
+        .registration-launch .launch-photo::before { content: ''; position: absolute; top: -14px; left: 35%; width: 30%; height: 28px; background: rgba(255,244,232,.85); transform: rotate(3deg); z-index: 1; }
+        .registration-launch .launch-photo img { display: block; width: 100%; aspect-ratio: 1.5; object-fit: cover; filter: saturate(.72) contrast(1.06); }
+        .registration-launch .launch-photo figcaption { padding: 13px 3px 14px; font-size: clamp(9px, .8vw, 13px); font-weight: 900; letter-spacing: .06em; }
+        .registration-launch .launch-photo-main { width: 61%; left: 5%; top: 27%; transform: rotate(-7deg); z-index: 1; }
+        .registration-launch .launch-photo:hover { transform: rotate(0) translateY(-12px); box-shadow: 10px 20px 0 rgba(23,23,23,.13); z-index: 3; }
+        .registration-launch .launch-note { position: absolute; left: 12%; bottom: 10%; border-left: 5px solid #fff4e8; padding-left: 16px; font-size: clamp(22px, 2.4vw, 38px); line-height: 1.05; font-weight: 900; letter-spacing: -.04em; transform: rotate(-4deg); }
+        .registration-launch.is-launched .launch-photo img { animation: cohortPhotoIn .9s ease-out both; }
+        @keyframes cohortPhotoIn { from { opacity: 0; filter: saturate(0) contrast(1.15); } to { opacity: 1; filter: saturate(.72) contrast(1.06); } }
+        .registration-launch .launch-mantra { display: flex; flex-wrap: wrap; gap: 8px; font-weight: 900; text-transform: uppercase; }
+        .registration-launch .launch-stats { position: absolute; top: 20%; right: 4%; width: 25%; display: grid; gap: 18px; z-index: 3; }
+        .registration-launch .launch-stat { border-top: 1px solid #fff4e8; padding: 14px 0 0; background: #0b0b0b; }
+        .registration-launch .launch-stat strong { display: block; font-size: clamp(38px, 4.4vw, 72px); line-height: 1; font-weight: 950; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+        .registration-launch .launch-stat-label { display: block; margin-top: 5px; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+        .registration-launch .launch-stat p { margin: 7px 0 0; color: #c8beb3; font-size: 11px; line-height: 1.5; }
+        .registration-launch.is-launched .launch-stat { animation: cohortStatIn .65s var(--stat-delay) both cubic-bezier(.16,1,.3,1); }
+        @keyframes cohortStatIn { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 767px) {
+          .registration-launch { scroll-margin-top: 0; }
+          .registration-launch .launch-layout { grid-template-columns: 1fr; min-height: 100svh; }
+          .registration-launch .launch-art { min-height: 760px; }
+          .registration-launch .launch-type { font-size: clamp(68px, 17vw, 115px); }
+          .registration-launch .launch-sticker { left: 6%; top: 20px; }
+          .registration-launch .launch-sticker img { width: 160px; height: 72px; }
+          .registration-launch .launch-rocket-control { width: 23%; left: 72%; top: 81%; height: 18%; }
+          .registration-launch .launch-info { padding: 40px 28px 48px; align-items: flex-start; text-align: left; border-left: 0; border-top: 2px solid #171717; }
+          .registration-launch .launch-info::before { display: none; }
+          .registration-launch .launch-heading { font-size: clamp(48px, 12vw, 72px); }
+          .registration-launch .launch-edition { margin-bottom: 28px; }
+          .registration-launch .launch-stats { top: 61%; left: 7%; right: 7%; width: auto; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+          .registration-launch .launch-stat strong { font-size: 38px; }
+          .registration-launch .launch-stat-label { font-size: 10px; letter-spacing: .04em; }
+          .registration-launch .launch-stat p { font-size: 10px; }
+          .registration-launch .launch-motion-toggle { bottom: 17%; }
+          .registration-launch .launch-photo-main { width: 86%; left: 7%; top: 20%; }
+          .registration-launch .launch-note { left: 7%; bottom: 4%; font-size: 24px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .registration-launch::before, .registration-launch::after { display: none; animation: none; }
+          .registration-launch.is-launched .launch-stat { animation: none; }
+          .registration-launch .launch-button::before { transition: none; }
+          .registration-launch.is-launched .launch-photo img { animation: none; }
+          .registration-launch .launch-photo { transition: none; }
+          .registration-launch.is-launched .launch-rocket, .registration-launch.is-launched .launch-sticker, .registration-launch.is-launched .launch-date, .registration-launch.is-launched .launch-flame { animation: none; }
+          .registration-launch .launch-button, .registration-launch .launch-button span, .registration-launch .launch-year, .registration-launch .launch-type, .registration-launch .launch-rocket-control { transition: none; }
+          .registration-launch .launch-rocket-control, .registration-launch .launch-type { transform: none; }
+          .registration-launch .launch-type { animation: none; }
+          .registration-launch .launch-motion-toggle { display: none; }
+          .registration-launch.is-boosting .launch-rocket, .registration-launch.is-boosting .launch-flame { animation: none; }
+        }
+      `}</style>
+      <div className="launch-layout">
+        <div className="launch-art" onPointerMove={moveRocket} onPointerLeave={resetRocket}>
+          <div className="launch-type" aria-hidden="true">
+            {[0, 1].map(copy => (
+              <div className="launch-type-group" key={copy}>
+                {Array.from({ length: 8 }, (_, index) => <span key={index}>{index % 2 === 0 ? 'COHORT 01' : 'FIRST MOVERS'}</span>)}
+              </div>
+            ))}
+          </div>
+          <button type="button" className="launch-motion-toggle" aria-label={motionPaused ? 'Play background animation' : 'Pause background animation'} onClick={() => setMotionPaused(paused => !paused)}>{motionPaused ? '▶' : 'Ⅱ'}</button>
+          <div className="launch-sticker"><img src={registrationLaunchLogo} alt="InGenuityX" width="220" height="98" /></div>
+          <div className="launch-collage">
+            <figure className="launch-photo launch-photo-main">
+              <img src={journeyFinale} alt="A team presenting its solution on the finale stage" loading="lazy" />
+              <figcaption>TAKE YOUR SHOT. OWN THE ROOM.</figcaption>
+            </figure>
+            <div className="launch-stats" aria-label="Cohort at a glance">
+              {[
+                { value: 90, suffix: '+', label: 'Companies', note: 'Think beyond the classroom.' },
+                { value: CATEGORY_FILTERS.length - 1, suffix: '', label: 'Themes', note: 'Find your kind of challenge.' },
+                { value: 1, suffix: '', label: 'First cohort', note: 'Make your first move count.' },
+              ].map((stat, index) => (
+                <div key={stat.label} className="launch-stat" style={{ '--stat-delay': `${index * 140}ms` }} aria-label={`${stat.value}${stat.suffix} ${stat.label}`}>
+                  <strong aria-hidden="true">{String(Math.round(stat.value * statProgress)).padStart(index === 2 ? 2 : 1, '0')}{stat.suffix}</strong>
+                  <span className="launch-stat-label">{stat.label}</span>
+                  <p>{stat.note}</p>
+                </div>
+              ))}
+            </div>
+            <span className="launch-note">Dare. Discover.<br />DO.</span>
+          </div>
+          <button type="button" className="launch-rocket-control" aria-label="Launch the rocket animation" aria-disabled={boosting} onClick={launchRocket}>
+          <svg className="launch-rocket" viewBox="0 0 400 440" fill="none" aria-hidden="true">
+            <path d="M145 310C118 324 81 365 77 402C115 394 151 366 165 332" fill="#fff4e8" stroke="#171717" strokeWidth="7" className="launch-flame" />
+            <path d="M146 324L111 369L161 339" fill="#fffaf5" className="launch-flame" />
+            <path d="M161 196L100 220L77 291L160 266M241 278L219 346L151 367L168 282" fill="#fff4e8" stroke="#171717" strokeWidth="7" strokeLinejoin="round" />
+            <path d="M135 267C156 168 232 90 341 58C342 171 285 260 185 308L135 267Z" fill="#fffaf5" stroke="#171717" strokeWidth="8" strokeLinejoin="round" />
+            <path d="M267 91C291 73 317 63 341 58C341 87 337 113 327 137L267 91Z" fill="#fff4e8" stroke="#171717" strokeWidth="7" />
+            <circle cx="249" cy="180" r="37" fill="#fff4e8" stroke="#171717" strokeWidth="7" />
+            <circle cx="249" cy="180" r="22" fill="#171717" />
+            <path d="M239 168L254 163" stroke="white" strokeWidth="7" strokeLinecap="round" />
+            <path d="M139 266L185 309L169 330L118 283L139 266Z" fill="#fff4e8" stroke="#171717" strokeWidth="7" strokeLinejoin="round" />
+            <path d="M202 242L151 313" stroke="#171717" strokeWidth="8" strokeLinecap="round" />
+            <path d="M81 152L73 177M57 159L94 169M337 261L329 286M313 268L350 279M192 53L187 71M181 60L199 65" stroke="#171717" strokeWidth="5" strokeLinecap="round" />
+            <path d="M78 322L41 349M197 367L173 401" stroke="#fff4e8" strokeWidth="9" strokeLinecap="round" />
+          </svg>
+          </button>
+        </div>
+        <div className="launch-info">
+          <p className="launch-edition">INGENUITYX / COHORT 01 OCT 2026</p>
+          <h2 id="registration-launch-title" className="launch-heading">Don’t just<br />watch.<br /><em>Be in the room.</em></h2>
+          <p className="launch-one-liner">Be the team they talk about.</p>
+          <p className="launch-subline launch-mantra">Dare <span aria-hidden="true">››</span> Discover <span aria-hidden="true">››</span> Do.</p>
+          <Link to="/register" className="launch-button">Join Cohort 01 <span aria-hidden="true">↗</span></Link>
+          <p className="launch-footnote">The first chapter only happens once.</p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -388,7 +587,7 @@ function RegistrationJourney() {
       `}</style>
       <div className="max-w-3xl mb-10 md:mb-16">
         <p className="text-[#E92A39] text-xs font-black uppercase tracking-[.2em] mb-4">Your journey starts with registration</p>
-        <h2 id="registration-journey-title" className="text-4xl md:text-6xl font-black tracking-tight text-white mb-5">Your Next Move? <span className="text-[#E92A39]">Register.</span></h2>
+        <h2 id="registration-journey-title" className="text-4xl md:text-6xl font-black tracking-tight text-white mb-5">Dare <span className="text-[#E92A39]">&gt;&gt;&gt;&gt;</span> Discover <span className="text-[#E92A39]">&gt;&gt; DO</span></h2>
         <p className="text-[#A1A1AA] text-base md:text-xl font-semibold max-w-xl">Head to the registration page to create your InGenuityX profile. Start there, then follow the journey from your first brief to the finale.</p>
         <Link to="/register" className="inline-flex items-center gap-2 mt-6 bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-7 py-4 rounded-full text-sm font-black transition-colors">Go to Registration <ChevronRight className="w-4 h-4" /></Link>
       </div>
@@ -433,12 +632,11 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState(-1);
   const [heroVideoIndex, setHeroVideoIndex] = useState(0);
   const [processVideoIndex, setProcessVideoIndex] = useState(0); 
-  const [selectedCity, setSelectedCity] = useState(null); 
 
   const waitlistRank = 2843;
 
   const heroVideos = [
-     intervie, preparation2, chaos, celebration3
+     intervie, collaborating, chaos, celebration3
   ].filter(Boolean).map(src => ({ src })); 
 
   const scrollToWaitlist = () => {
@@ -714,14 +912,16 @@ export default function Home() {
         </div>
       </section>
 
-      <RegistrationJourney />
+      <PreRegistrationStatement />
+
+      <RegistrationLaunchBanner />
 
       {/* 3. PICK YOUR LANE */}
       <section className="py-12 md:py-16 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
         <ScrollReveal>
           <div className="mb-8 md:mb-10 text-left">
-            <h3 className="text-3xl md:text-5xl font-black tracking-tight text-white mb-2 md:mb-4">Find your vibe</h3>
-            <p className="text-[#A1A1AA] font-bold text-sm md:text-lg">No endless scrolling. Pick your field to see the live briefs.</p>
+            <h3 className="text-3xl md:text-5xl font-black tracking-tight text-white mb-2 md:mb-4">Find your vibe(and tribe)</h3>
+            <p className="text-[#A1A1AA] font-bold text-sm md:text-lg">Choose from the 6 Rooms where you get noticed</p>
           </div>
         </ScrollReveal>
         
@@ -729,7 +929,6 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 md:gap-y-8 gap-x-4 md:gap-x-12 md:px-6">
           {CATEGORY_FILTERS.filter(f => f !== 'All').map((catName, i) => {
             const catColor = CATEGORY_COLORS[catName] || '#FAFAFA';
-            const count = opportunities.filter(o => o.category === catName).length;
             const data = CATEGORY_DATA[catName];
             
             return (
@@ -752,6 +951,7 @@ export default function Home() {
 
                   {/* Text Content */}
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-5 md:p-8 md:transform md:skew-x-6 pointer-events-none">
+                    <span className="absolute top-5 left-5 md:top-6 md:left-8 text-4xl md:text-5xl font-black text-white/80 leading-none" aria-label={`Theme ${i + 1}`}>{i + 1}</span>
                     {/* Default View */}
                     <div className="md:absolute md:bottom-6 md:left-8 md:right-6 transition-all duration-300 md:group-hover:opacity-0 md:group-hover:translate-y-4">
                       <h4 
@@ -764,7 +964,6 @@ export default function Home() {
                       >
                         {catName}
                       </h4>
-                      <p className="text-[#A1A1AA] text-xs font-bold uppercase tracking-widest mt-1 bg-black/60 md:bg-black/40 px-2 py-1 w-fit rounded">{count} Live</p>
                     </div>
 
                     {/* Desktop Hover Reveal */}
@@ -775,9 +974,6 @@ export default function Home() {
                         {catName}
                       </h4>
                       <p className="text-white/90 text-sm md:text-base font-semibold mb-6 max-w-[220px] md:max-w-sm leading-relaxed drop-shadow-md">{data.desc}</p>
-                      <span className="bg-black/30 backdrop-blur-sm border border-white/20 text-white px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span> {count} Live Briefs
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -994,78 +1190,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. THE CORPORATE CORRIDOR (Interactive 3D Map) */}
-      <section className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
-        <ScrollReveal>
-          <div className="mb-10 md:mb-16 text-left md:text-center">
-            <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-3 md:mb-4">
-              We're not waiting. <span className="text-[#E92A39]">We're already in the room.</span>
-            </h2>
-            <p className="text-[#A1A1AA] font-bold text-sm md:text-xl max-w-2xl md:mx-auto">
-              Right now, we're in the inbox of R&D and innovation leads across India's biggest business hubs. Hover the pins on the interactive map.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal delay={100}>
-          <div className="relative bg-[#1C1C1E]/80 backdrop-blur-sm border border-[#2A2A2E] rounded-[2rem] p-6 md:p-12 flex flex-col md:flex-row items-center gap-8 md:gap-16 overflow-hidden">
-            <div className="absolute -top-1/3 left-1/4 w-[600px] h-[600px] bg-[#E92A39]/10 rounded-full blur-[120px] pointer-events-none" />
-
-            {/* INTERACTIVE 3D GLOBE */}
-            <div className="w-full md:w-1/2 h-[350px] md:h-[500px] relative z-10 cursor-move border border-[#2A2A2E] rounded-[2rem] bg-[#0A0A0A] overflow-hidden">
-              <OutreachGlobe onCityClick={setSelectedCity} selectedCity={selectedCity} />
-              <div className="absolute bottom-4 left-4 pointer-events-none">
-                 <span className="bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-[#A1A1AA] flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" /> Live Tracking
-                 </span>
-              </div>
-            </div>
-
-            {/* SIDE STATS */}
-            <div className="w-full md:w-1/2 flex flex-col gap-6 relative z-10 h-full">
-              {!selectedCity ? (
-                <div className="bg-[#161616] border border-[#2A2A2E] p-6 md:p-8 rounded-3xl animate-text-fade-up">
-                  <h3 className="text-5xl md:text-7xl font-black text-white leading-none mb-2">{OUTREACH_CITIES.length}</h3>
-                  <p className="text-[#E92A39] font-black text-xs md:text-sm uppercase tracking-widest mb-4">Major Business Hubs</p>
-                  <div className="h-px w-full bg-[#2A2A2E] mb-4" />
-                  <p className="text-[#A1A1AA] text-sm md:text-base font-semibold leading-relaxed">
-                    From Gurugram boardrooms to Bengaluru's R&D floors — these are the cities where we're actively pitching InGenuityX to brand partners. Tap a pin on the map to see who we're talking to.
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-[#161616] border border-[#E92A39]/40 p-6 md:p-8 rounded-3xl animate-text-fade-up shadow-[0_0_30px_rgba(233,42,57,0.08)]">
-                  <button onClick={() => setSelectedCity(null)} className="text-[#A1A1AA] text-[10px] font-black uppercase tracking-widest mb-6 hover:text-white transition-colors flex items-center gap-1">
-                    ← Back to Overview
-                  </button>
-                  <h3 className="text-4xl md:text-5xl font-black text-white leading-none mb-2">{selectedCity.name}</h3>
-                  <p className="text-[#E92A39] font-black text-xs md:text-sm uppercase tracking-widest mb-4">Active Corporate Outreach</p>
-                  <div className="h-px w-full bg-[#2A2A2E] mb-6" />
-                  <div className="flex flex-col gap-3">
-                    {selectedCity.companies.map((company, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-[#0A0A0A] border border-[#2A2A2E] px-4 py-3 rounded-xl">
-                        <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                        <span className="text-white font-bold text-sm md:text-base">{company}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 mt-auto">
-                 <div className="bg-[#161616] border border-[#2A2A2E] p-5 rounded-2xl flex flex-col justify-center">
-                    <span className="block text-2xl md:text-3xl font-black text-white mb-1">50+</span>
-                    <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-widest">Active Pitches</span>
-                 </div>
-                 <div className="bg-[#161616] border border-[#2A2A2E] p-5 rounded-2xl flex flex-col justify-center">
-                    <span className="block text-2xl md:text-3xl font-black text-white mb-1">100%</span>
-                    <span className="text-[10px] font-bold text-[#71717A] uppercase tracking-widest">Real Brands</span>
-                 </div>
-              </div>
-            </div>
-
-          </div>
-        </ScrollReveal>
-      </section>
+      <RegistrationJourney />
 
       {/* 9. FAQ */}
       <section className="py-16 md:py-24 px-4 md:px-8 bg-transparent border-t border-[#2A2A2E]">
