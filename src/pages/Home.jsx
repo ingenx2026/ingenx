@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ImageWithFallback } from '../components/ImageWithFallback';
-import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal, Copy, Star } from 'lucide-react';
+import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal, Copy } from 'lucide-react';
 import Globe from 'react-globe.gl';
 
 // --- MEDIA IMPORTS ---
@@ -26,14 +26,11 @@ import ingenxPosterBg from '../imports/IngenX (2).png';
 import evereadyBg from '../imports/eveready.png';
 
 // --- CREATOR CHALLENGE IMAGES ---
-import creatorImg1 from '../imports/creator\'s challenge.png';
-import creatorImg2 from '../imports/creator\'s challenge 2.png';
-import creatorImg3 from '../imports/creator\'s challenge 3.png';
+import creatorImg1 from "../imports/creator's challenge.png";
 
 // --- HERO VIDEOS ---
 import intervie from '../imports/intervie.mp4';
 import preparation2 from '../imports/preparation2.mp4';
-import pizza from '../imports/pizza.mp4';
 import prep from '../imports/prep.mp4';
 import chaos from '../imports/chaos.mp4';
 import celebration3 from '../imports/celebration3.mp4';
@@ -47,7 +44,7 @@ import img7 from '../imports/img7.png';
 // =====================================================================
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
 const PLACEHOLDER_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop";
-const GLOBAL_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop"; 
+const GLOBAL_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const CATEGORY_COLORS = {
@@ -56,9 +53,11 @@ const CATEGORY_COLORS = {
   Design: '#A855F7',
   Sustainability: '#10B981',
   Innovation: '#F59E0B',
+  "The Creator's Challenge": '#E92A39',
 };
 
 const CATEGORY_DATA = {
+  "The Creator's Challenge": { img: creatorImg1, desc: 'Think you can make it go viral? Prove it. Build in public, rally the community vote, and pitch the founders.' },
   Marketing: { img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop', desc: 'Brand strategy, GTM, research, and positioning.' },
   Tech: { img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop', desc: 'Hackathons, coding challenges, AI, and systems.' },
   Design: { img: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop', desc: 'UI/UX, product design, branding, and aesthetics.' },
@@ -75,13 +74,13 @@ const PLATFORM_REWARDS = [
 ];
 
 const REWARD_IMAGES = [
-  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop", 
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop", 
-  img6, 
-  "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=800&auto=format&fit=crop"  
+  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop",
+  img6,
+  "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=800&auto=format&fit=crop"
 ];
 
-// --- PROCESS SECTION DATA (Updated to use packing.mp4) ---
+// --- PROCESS SECTION DATA ---
 const PROCESS_CLIPS = [
   { src: packing, label: '01 / BRIEF PADHO' },
   { src: intervie, label: '02 / INSIGHT DHUNDO' },
@@ -91,13 +90,13 @@ const PROCESS_CLIPS = [
 
 // --- HERO HEADLINE HOOKS ---
 const HERO_RED_HOOKS = [
-  "sabse bade problems.", "real, unfiltered briefs.", "whiteboard war rooms.", 
-  "late-night build sessions.", "mentorship moments.", "campus showdowns.", 
-  "massive prize pools.", "your 'I made it' era." 
+  "sabse bade problems.", "real, unfiltered briefs.",
+  "mentorship moments.", "campus showdowns.",
+  "massive prize pools.", "your 'I made it' era."
 ];
 
 // --- FILTER TABS ---
-const CATEGORY_FILTERS = ['All', 'Marketing', 'Tech', 'Design', 'Sustainability', 'Innovation'];
+const CATEGORY_FILTERS = ['All', 'Marketing', 'Tech', 'Design', 'Sustainability', 'Innovation', "The Creator's Challenge"];
 
 // --- MAP DATA ---
 const OUTREACH_CITIES = [
@@ -181,7 +180,6 @@ function OutreachGlobe({ onCityClick, selectedCity }) {
   const [statesData, setStatesData] = useState([]);
 
   useEffect(() => {
-    // Initial camera position centered on India
     if (globeEl.current) {
       globeEl.current.pointOfView({ lat: 21.5937, lng: 78.9629, altitude: 0.8 }, 2000);
       globeEl.current.controls().enableZoom = false;
@@ -267,7 +265,7 @@ function OutreachGlobe({ onCityClick, selectedCity }) {
   );
 }
 
-// --- CROSSFADE VIDEO PLAYER (perf) ---
+// --- CROSSFADE VIDEO PLAYER ---
 function CrossfadeVideoPlayer({ clips, activeIndex, poster, className = '', videoClassName = '' }) {
   const videoRefs = useRef([]);
 
@@ -315,19 +313,11 @@ export default function Home() {
   const [processVideoIndex, setProcessVideoIndex] = useState(0); 
   const [selectedCity, setSelectedCity] = useState(null); 
 
-  const teaserScrollRef = useRef(null);
   const waitlistRank = 2843;
 
   const heroVideos = [
-     intervie, preparation2, pizza, prep, chaos, celebration3
+     intervie, preparation2, chaos, celebration3
   ].filter(Boolean).map(src => ({ src })); 
-
-  const scrollTrack = (ref, direction) => {
-    if (ref.current) {
-      const scrollAmount = window.innerWidth > 768 ? 400 : 300;
-      ref.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   const scrollToWaitlist = () => {
     document.getElementById('waitlist-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -602,40 +592,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. LIVE CHALLENGE TEASER STRIP */}
-      <section className="relative z-20 -mt-12 md:-mt-24 px-4 md:px-8 max-w-[1600px] mx-auto pb-12 md:pb-20">
-        <div className="flex items-center justify-between mb-4 px-1 md:px-2">
-          <p className="text-[10px] md:text-xs font-black text-[#A1A1AA] uppercase tracking-widest">Sneak Peek: Live in the Vault</p>
-          <div className="hidden md:flex gap-2">
-            <button onClick={() => scrollTrack(teaserScrollRef, 'left')} className="w-8 h-8 rounded-full border border-[#2A2A2E] bg-[#161616]/80 backdrop-blur-md flex items-center justify-center text-[#A1A1AA] hover:text-white transition-colors">←</button>
-            <button onClick={() => scrollTrack(teaserScrollRef, 'right')} className="w-8 h-8 rounded-full border border-[#2A2A2E] bg-[#161616]/80 backdrop-blur-md flex items-center justify-center text-[#A1A1AA] hover:text-white transition-colors">→</button>
-          </div>
-        </div>
-        
-        <div ref={teaserScrollRef} className="flex overflow-x-auto hide-scrollbar gap-3 md:gap-4 pb-4 snap-x snap-mandatory">
-          {opportunities.slice(0, 5).map((opp, i) => (
-            <div key={i} className="w-[80vw] sm:w-[320px] shrink-0 snap-center relative rounded-2xl overflow-hidden bg-[#161616]/80 backdrop-blur-sm border border-[#2A2A2E] h-[180px] md:h-[220px] group cursor-pointer shadow-lg" onClick={scrollToWaitlist}>
-              <img src={opp.bgImage || PLACEHOLDER_BG} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40 md:group-hover:opacity-60 transition-opacity duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#151515] via-[#151515]/80 to-transparent" />
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-[2px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 z-20">
-                <Lock className="w-6 h-6 md:w-8 md:h-8 text-white mb-2" />
-                <span className="bg-[#E92A39] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">Unlocks on Dussehra (Oct 20)</span>
-              </div>
-
-              <div className="relative z-10 p-4 md:p-5 h-full flex flex-col justify-end">
-                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#A1A1AA] mb-1 md:mb-2">{opp.company}</span>
-                <h4 className="text-lg md:text-xl font-black text-white leading-tight mb-2 truncate">{opp.title}</h4>
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] md:text-[10px] font-bold px-2 py-1 rounded bg-white/10 text-white/90 border border-white/5">{opp.type}</span>
-                  <span className="text-[9px] md:text-[10px] font-bold text-[#10b981]">{opp.points?.split('+')[0] || 'Reward'}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* 3. PICK YOUR LANE */}
       <section className="py-12 md:py-16 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
         <ScrollReveal>
@@ -645,15 +601,15 @@ export default function Home() {
           </div>
         </ScrollReveal>
         
-        {/* Mobile: Horizontal Scroll. Desktop: Slanted Accordion */}
-        <div className="flex overflow-x-auto md:overflow-visible hide-scrollbar flex-row gap-3 md:gap-4 h-[220px] md:h-[450px] snap-x snap-mandatory pb-4 md:pb-0">
+        {/* Responsive Theme Grid: Three Cards Per Row on Desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 md:gap-y-8 gap-x-4 md:gap-x-12 md:px-6">
           {CATEGORY_FILTERS.filter(f => f !== 'All').map((catName, i) => {
             const catColor = CATEGORY_COLORS[catName] || '#FAFAFA';
             const count = opportunities.filter(o => o.category === catName).length;
             const data = CATEGORY_DATA[catName];
             
             return (
-              <ScrollReveal key={i} delay={i * 50} className="w-[75vw] sm:w-[300px] md:w-auto shrink-0 snap-center md:flex-1 md:min-w-0 transition-all duration-500 ease-out md:hover:flex-[2.5]">
+              <ScrollReveal key={i} delay={i * 50} className="min-w-0 h-[280px] md:h-[360px]">
                 <div 
                   onClick={() => { setActiveFilter(catName); document.getElementById('opportunities')?.scrollIntoView({ behavior: 'smooth' }); }}
                   className="relative h-full w-full overflow-hidden group cursor-pointer transition-all duration-500 ease-out md:transform md:-skew-x-6 rounded-2xl md:rounded-2xl border border-[#2A2A2E] hover:border-transparent"
@@ -673,7 +629,7 @@ export default function Home() {
                   {/* Text Content */}
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-5 md:p-8 md:transform md:skew-x-6 pointer-events-none">
                     {/* Default View */}
-                    <div className="md:absolute md:bottom-6 md:left-8 transition-all duration-300 md:group-hover:opacity-0 md:group-hover:translate-y-4">
+                    <div className="md:absolute md:bottom-6 md:left-8 md:right-6 transition-all duration-300 md:group-hover:opacity-0 md:group-hover:translate-y-4">
                       <h4 
                         className={`text-2xl md:text-xl font-black text-white uppercase drop-shadow-lg ${
                           catName.length > 10 
@@ -688,9 +644,9 @@ export default function Home() {
                     </div>
 
                     {/* Desktop Hover Reveal */}
-                    <div className="hidden md:flex opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-200 flex-col items-start h-full justify-center pl-2 md:pl-6 w-[120%] md:w-full">
-                      <h4 className={`text-3xl md:text-4xl font-black text-white mb-3 tracking-tight drop-shadow-lg ${
-                        catName.length > 10 ? 'lg:text-3xl xl:text-4xl' : 'lg:text-5xl'
+                    <div className="hidden md:flex opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-200 flex-col items-start h-full justify-center w-full">
+                      <h4 className={`text-2xl font-black text-white mb-3 tracking-tight drop-shadow-lg ${
+                        catName.length > 10 ? 'xl:text-3xl' : 'xl:text-4xl'
                       }`}>
                         {catName}
                       </h4>
@@ -704,70 +660,6 @@ export default function Home() {
               </ScrollReveal>
             );
           })}
-        </div>
-      </section>
-
-      {/* 3.5. CREATOR'S CHALLENGE */}
-      <section className="relative w-full py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E] overflow-hidden">
-        <ScrollReveal>
-          <div className="mb-10 md:mb-16 text-left md:text-center flex flex-col md:items-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E92A39]/10 border border-[#E92A39]/20 text-[#E92A39] text-[10px] md:text-xs font-black uppercase tracking-widest mb-4">
-              <span className="w-2 h-2 rounded-full bg-[#E92A39] animate-pulse"></span>
-              Special Event
-            </div>
-            <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-3 md:mb-4">
-              The Creator's Challenge
-            </h2>
-            <p className="text-[#A1A1AA] font-bold text-sm md:text-xl max-w-2xl md:mx-auto">
-              Think you can make it go viral? Prove it
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {[
-            {
-              title: "Build in Public",
-              desc: "Film it, post it, and let everyone see how you make it happen.",
-              img: creatorImg1,
-              tag: "Stage 01"
-            },
-            {
-              title: "Community Vote",
-              desc: "The internet decides your fate. Rally your audience and let the community elevate the best ideas.",
-              img: creatorImg2,
-              tag: "Stage 02"
-            },
-            {
-              title: "Pitch the Founders",
-              desc: "Top creators take their ideas straight to the people who built the brands.",
-              img: creatorImg3,
-              tag: "Final Boss"
-            }
-          ].map((card, i) => (
-            <ScrollReveal key={i} delay={i * 100} className="group cursor-pointer">
-              <div className="relative h-[400px] md:h-[500px] rounded-[2rem] overflow-hidden bg-[#161616] border border-[#2A2A2E] group-hover:border-[#E92A39]/60 transition-all duration-500 transform md:group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(233,42,57,0.2)]">
-                {/* Background Image & Overlay */}
-                <img src={card.img} alt={card.title} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700 ease-out" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/40 to-transparent"></div>
-                
-                {/* Floating Tag */}
-                <div className="absolute top-6 left-6 z-10">
-                  <span className="bg-[#151515]/80 backdrop-blur-md text-white border border-[#2A2A2E] px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2">
-                    <Star className="w-3 h-3 text-[#E92A39]" /> {card.tag}
-                  </span>
-                </div>
-
-                {/* Animated Text Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-10 transform translate-y-4 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2 tracking-tight group-hover:text-[#E92A39] transition-colors">{card.title}</h3>
-                  <div className="h-0 md:h-auto overflow-hidden md:overflow-visible">
-                    <p className="text-[#A1A1AA] text-sm md:text-base font-bold opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 mt-2">{card.desc}</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
         </div>
       </section>
 
