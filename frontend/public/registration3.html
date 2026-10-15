@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IngenuityX | Student Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['"Inter"', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif']
+                    },
+                    colors: {
+                        studio: {
+                            base: '#FDFCFB',
+                            accent: '#FF4500', // Electric Orange
+                            black: '#18181B',
+                            gray: '#71717A',
+                            line: '#E4E4E7'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF4500; }
+        input:focus, textarea:focus, select:focus { outline: none; box-shadow: none !important; }
+
+        /* --- ROAST TOOLTIP CSS --- */
+        .roast-tooltip {
+            position: absolute;
+            background: #FF4500;
+            color: white;
+            padding: 4px 8px;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 4px;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 4px;
+        }
+        .roast-tooltip.visible { opacity: 1; transform: translateY(0); }
+        
+        .loader {
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; border-top: 2px solid #FF4500;
+            width: 18px; height: 18px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .skill-pill { transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        body.keyboard-open footer { display: none; }
+
+        /* =========================================
+           THE CANVAS: VOID & ATMOSPHERE OVERRIDES
+           ========================================= */
+        
+        /* Deep background with a subtle fixed gradient orb */
+        body {
+            background-color: #09090B !important;
+            color: #FAFAFA !important;
+            background-image: radial-gradient(circle at 50% -20%, rgba(255, 69, 0, 0.15), transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Film Grain Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.04"/%3E%3C/svg%3E');
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Glassmorphism Main Container */
+        #main-content {
+            background: rgba(255, 255, 255, 0.02) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            margin-top: 2rem !important;
+        }
+
+        /* Typography & Color Overrides for Dark Mode */
+        h2, h3, #step-label, .text-studio-black { color: #FFFFFF !important; }
+        p, .text-studio-gray { color: #A1A1AA !important; }
+        label { color: #A1A1AA !important; letter-spacing: 0.15em !important; }
+        .bg-studio-line { background-color: rgba(255, 255, 255, 0.1) !important; }
+        nav { border-bottom-color: rgba(255, 255, 255, 0.05) !important; }
+
+        /* Premium Ghost Inputs */
+        input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="url"], textarea {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
+            padding: 1rem 1.2rem !important;
+            color: #FAFAFA !important;
+            transition: all 0.3s ease !important;
+        }
+
+        input:focus, textarea:focus, input:focus-within {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: #FF4500 !important;
+            box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1) !important;
+        }
+
+        /* Override the inline bottom-border styling from JS */
+        input.border-b-2, textarea.border-b-2 { border-bottom-width: 1px !important; }
+
+        /* Primary Button Glow Up */
+        #next-btn, button[onclick^="verifyOtp"], button[onclick^="startVideoRecord"] {
+            background: linear-gradient(135deg, #FF4500, #CC3700) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 25px -5px rgba(255, 69, 0, 0.4) !important;
+            letter-spacing: 0.05em;
+            color: #FFFFFF !important;
+        }
+
+        #next-btn:hover, button[onclick^="verifyOtp"]:hover, button[onclick^="startVideoRecord"]:hover {
+            box-shadow: 0 15px 35px -5px rgba(255, 69, 0, 0.6) !important;
+            transform: translateY(-2px);
+        }
+
+        /* Skill Pills & Chips (Glassy) */
+        .skill-pill, button[onclick^="handleChipClick"] {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #A1A1AA !important;
+        }
+        
+        .skill-pill.active, button[onclick^="handleChipClick"].bg-studio-black {
+            background: #FFFFFF !important;
+            color: #09090B !important;
+            border-color: #FFFFFF !important;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2) !important;
+        }
+
+        /* Secondary UI Containers (Resume, Video Box, Links) */
+        .bg-zinc-50, .bg-zinc-100 { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        [id^="recorder-container-"] { border-color: rgba(255, 255, 255, 0.1) !important; }
+        [id^="recorder-container-"]:hover { border-color: #FF4500 !important; background: rgba(255,69,0,0.02) !important; }
+        
+        /* Cliche Popup */
+        #cliche-popup-content {
+            background: rgba(15, 15, 18, 0.85) !important;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        #cliche-popup-content button {
+            background: #FFFFFF !important;
+            color: #09090B !important;
+        }
+        #cliche-popup-content button:hover { background: #FF4500 !important; color: #FFFFFF !important; }
+        #cliche-word { background: rgba(255,69,0,0.1) !important; border: 1px solid rgba(255,69,0,0.3); }
+
+        /* End Overrides */
+        
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+    <nav class="w-full max-w-4xl mx-auto px-6 py-10 flex justify-between items-end border-b border-dashed border-studio-line">
+        <div class="flex flex-col z-10">
+            <span class="font-mono text-[10px] text-studio-gray uppercase tracking-widest mb-1">Official Portal</span>
+            <div class="font-display font-bold text-2xl tracking-tight text-studio-black">Ingenuity<span class="text-studio-accent">X</span></div>
+        </div>
+        <div class="hidden md:block text-xs font-bold text-studio-gray font-mono uppercase tracking-widest z-10">Student Portal 2026</div>
+    </nav>
+    
+    <main id="main-content" class="flex-1 w-full max-w-xl mx-auto px-6 pb-20 mt-8 flex flex-col relative z-10">
+        
+        <div class="mb-12">
+            <div class="flex justify-between items-baseline mb-2">
+                <span id="step-label" class="text-sm font-bold text-studio-black font-display tracking-tight">Start</span>
+                <span id="step-counter" class="text-xs font-mono text-studio-gray">01 / 04</span>
+            </div>
+            <div class="h-[2px] w-full bg-studio-line overflow-hidden relative rounded-full">
+                <div id="progress-bar" class="absolute top-0 left-0 h-full bg-studio-accent transition-all duration-700 ease-out w-[25%] shadow-[0_0_10px_#FF4500]"></div>
+            </div>
+        </div>
+
+        <div id="wizard-form" class="w-full relative min-h-[400px] flex flex-col">
+            <div id="step-container" class="flex-1"></div>
+
+            <div class="mt-12 flex items-center justify-between pt-6 border-t border-dashed border-white/10">
+                <button type="button" id="prev-btn" class="hidden text-studio-gray hover:text-white font-medium text-sm transition-colors group">
+                    <span class="group-hover:-translate-x-1 inline-block transition-transform">←</span> Back
+                </button>
+                
+                <button type="button" id="next-btn" class="bg-studio-black text-white px-8 py-4 font-bold text-sm hover:bg-studio-accent transition-all duration-300 rounded-lg flex items-center gap-3 ml-auto group shadow-none hover:shadow-lg active:translate-y-0.5">
+                    Continue <span class="group-hover:translate-x-1 transition-transform">→</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+    
+    <footer class="fixed bottom-4 left-6 text-[10px] font-mono text-studio-gray hidden md:block z-10">
+        SECURE CONNECTION • V.3.2 (STABLE)
+    </footer>
+
+    <div id="cliche-popup" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center backdrop-blur-md">
+        <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center scale-95 transition-transform duration-300 transform" id="cliche-popup-content">
+            <div class="text-5xl mb-4">🥱</div>
+            <h3 class="text-xl font-bold font-display mb-2 tracking-tight">Bro, really? 😭</h3>
+            <p class="text-studio-gray text-sm mb-6">You just dropped the most basic, ChatGPT-ass corporate jargon: <br><span id="cliche-word" class="font-bold text-studio-accent text-lg block mt-2 p-2 bg-zinc-100 rounded"></span><br>Sharma ji ka beta uses these words. We expect some actual personality from you. Try again.</p>
+            <button onclick="closeClichePopup()" class="bg-studio-black text-white px-8 py-3 rounded-lg font-bold text-xs uppercase hover:bg-studio-accent transition-colors">My bad, I'll be real</button>
+        </div>
+    </div>
+
+    <script>
+    const EMAILJS_CONFIG = { PUBLIC_KEY: "ThJxoI9bg5wTLThG5", SERVICE_ID: "service_da4bk3x", OTP_TEMPLATE_ID: "template_1c4m33z", WELCOME_TEMPLATE_ID: "template_n9dcd4n" };
+    (function() { emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY); })();
+
+    // --- BANNED WORDS ARRAY ---
+    const BANNED_PHRASES = [
+        "im a fast learner",
+        "i'm a fast learner",
+        "i am a fast learner",
+        "team player",
+        "can wwork under pressure",
+        "can work under pressure",
+        "can work underpressure",
+        "good communicator",
+        "handle the projects but have not worked",
+        "learner",
+        "negotiation skills"
+    ];
+
+    const COMMON_CITIES = ["Mumbai", "Delhi", "Bangalore", "Bengaluru", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata", "Surat", "Pune", "Jaipur", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal", "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar", "Navi Mumbai", "Allahabad", "Ranchi", "Howrah", "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Jodhpur", "Madurai", "Raipur", "Kota", "Guwahati", "Chandigarh", "Solapur", "Hubli", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur", "Gurgaon", "Gurugram", "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Dehradun"];
+    const COMMON_DEGREES = ["B.Tech", "B.E.", "Bachelor of Technology", "Bachelor of Engineering", "B.Sc", "B.Com", "B.A.", "BBA", "BCA", "MBBS", "M.Tech", "MBA", "MCA", "M.Sc", "Ph.D", "Diploma"];
+    const COMMON_MAJORS = [ "Computer Science", "Information Technology", "Data Science", "Artificial Intelligence", "Cyber Security", "Machine Learning", "Pharmacy", "Pharmaceutical", "Mechanical", "Electrical", "Civil", "Electronics", "Chemical", "Biotechnology", "Business", "Management", "Economics", "Finance", "Marketing", "Psychology", "Design", "Architecture", "Law", "Nursing" ];
+    
+    const SKILL_SETS = {
+        'Tech': ['React', 'Python', 'AWS', 'Rust', 'AI/ML', 'Node.js', 'Cybersecurity', 'Blockchain', 'Flutter', 'Data Science', 'DevOps', 'Go'],
+        'Marketing': ['Growth Hacking', 'SEO', 'TikTok Strategy', 'Copywriting', 'Content Creation', 'Google Ads', 'Branding', 'Community Mgmt', 'Email Marketing'],
+        'Creative': ['Figma', '3D Design', 'Video Editing', 'Motion Graphics', 'UI/UX', 'Illustration', 'Blender', 'Photography', 'After Effects'],
+        'Business': ['Public Speaking', 'Project Mgmt', 'Finance', 'Leadership', 'Strategy', 'Pitching', 'Operations', 'Sales', 'Negotiation']
+    };
+
+    // --- ROAST CONFIGURATION ---
+    const roasts = {
+        'brag': { short: "That won't shut up Pummy aunty. Try harder.", long: "Mic drop! Rishtedars are typing... 🎤", empty: "Sharmane ka time gaya. Flex it!", extra: "Bro leave some ego for the rest of us 🔥" },
+        'failure': { short: "That's not trauma, that's Tuesday.", long: "Villain origin story certified 🍿", empty: "Everyone takes Ls. Drop yours.", funny: "Moye moye fr 😭" },
+        'motivation': { short: "Paisa? Fame? Sach bol de bhai.", long: "Bro has a whole masterplan 📝", empty: "Aise hi aagaye kya bina soche?", hype: "Wait, let him cook 👀" },
+        'dream_job': { short: "Sharma ji's kid is laughing rn. Aim higher.", long: "Sharma ji is officially intimidated 📉", empty: "Berozgar rehne ka irada hai kya?" },
+        
+        'password': { short: "GIRL! My grandma can hack this 👵", medium: "Okay, but I can still guess it.", long: "Fort Knox level security 🏰" },
+        
+        'instagram': { invalid: "That’s not Insta pookie.", valid: "Your soft launch is on its way now 📸" },
+        'camera': { start: "NPC mode off. Camera on.", capture: "Face card never declines 😮‍💨", retry: "Run it back, superstar.", noface: "Are you a ghost? Show me a human face. 👻", eyes: "Pirate mode? I need BOTH eyes visible. 👀", lowconf: "Hiding your face? Be proud.", loading: "Starting Vision Engine...", success: "Verified." }
+    };
+
+    // --- ROAST FUNCTIONALITY ---
+    function showRoast(fieldId, type) {
+        const container = document.getElementById(fieldId)?.parentElement;
+        if (!container) return;
+        let tooltip = container.querySelector('.roast-tooltip');
+        if (!tooltip) { tooltip = document.createElement('div'); tooltip.className = 'roast-tooltip'; container.appendChild(tooltip); }
+        let text = (roasts[fieldId] && roasts[fieldId][type]) ? roasts[fieldId][type] : "";
+        if (!text) return;
+        tooltip.innerText = text; tooltip.classList.add('visible'); setTimeout(() => { tooltip.classList.remove('visible'); }, 3000);
+    }
+
+    function showVideoRoast(fieldId, type) {
+        const container = document.getElementById(`recorder-container-${fieldId}`);
+        if (!container) return;
+        let tooltip = container.querySelector('.roast-tooltip');
+        if (!tooltip) { tooltip = document.createElement('div'); tooltip.className = 'roast-tooltip'; tooltip.style.bottom = 'auto'; tooltip.style.top = '10px'; tooltip.style.right = '10px'; container.appendChild(tooltip); }
+        let text = roasts.camera[type]; 
+        if (!text) return;
+        tooltip.innerText = text; tooltip.classList.add('visible'); setTimeout(() => { tooltip.classList.remove('visible'); }, 3000);
+    }
+
+    const PATTERNS = { 
+        email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, 
+        linkedin: /^https:\/\/(www\.)?linkedin\.com\/.*$/, 
+        instagram: /^https:\/\/(www\.)?instagram\.com\/.*$/, 
+        url: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/
+    };
+
+    const steps = [
+        // STEP 1: VIBE CHECK
+        {
+            id: "merged_vibe",
+            title: "Let's break the ice",
+            subtitle: "Skip the corporate talk. Who are you really?",
+            type: "form-group",
+            fields: [
+                { 
+                    id: "motivation", 
+                    label: "ASLI MAKSAD BATAO JANAB (THE REAL MOTIVE)", 
+                    type: "textarea", 
+                    placeholder: "No generic BS. Are you here for the hustle, the network, or just to prove your relatives wrong?", 
+                    width: "full", 
+                    required: true, 
+                    maxChars: 200
+                },
+                { 
+                    id: "dream_job", 
+                    label: "THE 'SHARMA JI KA BETA' JOB", 
+                    type: "textarea", 
+                    placeholder: "What's that one dream job you want just to finally outshine Sharma ji's kid?", 
+                    width: "full", 
+                    required: true, 
+                    maxChars: 150 
+                },
+                { 
+                    id: "brag", 
+                    label: "SILENCING THE RISHTEDARS (THE FLEX)", 
+                    type: "textarea", 
+                    placeholder: "What’s an achievement you casually drop to shut up that one annoying uncle at family dinners?", 
+                    width: "full", 
+                    required: true, 
+                    maxChars: 200, 
+                    note: "Main character energy strongly encouraged." 
+                },
+                { 
+                    id: "failure", 
+                    label: 'YOUR BIGGEST "MOYE MOYE" MOMENT', 
+                    type: "textarea", 
+                    placeholder: "Drop that one failure or canon event that completely humbled you and changed the plot.", 
+                    width: "full", 
+                    required: true, 
+                    maxChars: 200 
+                },
+                { 
+                    id: "hype_video", 
+                    label: "WHO ARE YOU, REALLY? (Optional)", 
+                    type: "video-capture", 
+                    width: "full", 
+                    required: false, 
+                    note: "Pro Tip: Recording a video increases your chance to get scouted by brands/team by 3x." 
+                } 
+            ]
+        },
+        // STEP 2: YOUR ARSENAL
+        { 
+            id: "merged_profile", 
+            title: "Your Arsenal", 
+            subtitle: "What's your domain, and what weapons do you wield?", 
+            type: "hybrid-profile", 
+            fields: [
+                { id: "domain", label: "I mostly dabble in...", type: "chips-single", options: ["Tech", "Marketing", "Creative", "Business"], width: "full", required: true }
+            ]
+        },
+        // STEP 3: PERSONAL DETAILS
+        { 
+            id: "personal_details", 
+            title: "The Boring (But Necessary) Stuff", 
+            subtitle: "Drop your resume to auto-fill, or just type it out.", 
+            type: "mixed-parser", 
+            mode: "academic",
+            contactFields: [
+                { id: "name", label: "What should we call you? (Full Name)", type: "text", placeholder: "Kushagra Choudhary", width: "full", required: true }, 
+                { id: "email", label: "Where should we send the good news? (Email)", type: "email", inputmode: "email", placeholder: "you@example.com", width: "half", required: true, verify: true }, 
+                { id: "phone", label: "Best number to reach you?", type: "tel", inputmode: "numeric", placeholder: "+91 98765 43210", width: "half", required: true, verify: true }, 
+                { id: "city", label: "Where are you based right now?", type: "text", placeholder: "Kolkata", width: "full", required: true }
+            ]
+        },
+        // STEP 4: IDENTITY
+        { 
+            id: "account", 
+            title: "Locking it down", 
+            subtitle: "Set up your keys to the kingdom.", 
+            type: "form-group", 
+            fields: [ 
+                { id: "password", label: "Create a solid password", type: "password", placeholder: "Min 8 chars", width: "full", required: true, showStrength: true },
+                { id: "linkedin", label: "Drop your LinkedIn", type: "url", placeholder: "https://linkedin.com/in/...", width: "full", required: true },
+                { id: "extra_links", label: "Got any other links? (Github, Portfolio, etc.)", type: "multi-link", placeholder: "https://...", width: "full", required: false }
+            ] 
+        }
+    ];
+
+    let currentStepIndex = 0;
+    let answers = { interests: [], extra_links: [], skills_list: [] };
+    let verificationCodes = {};
+    let contactCheckTimers = {};
+    let stepHistory = [];
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let activeStream = null;
+    let recordTimerInterval = null;
+
+    const container = document.getElementById('step-container');
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+
+    localStorage.removeItem('ingenuity_reg_data');
+    localStorage.removeItem('ingenuity_reg_history');
+    localStorage.removeItem('ingenuity_reg_index');
+
+    window.addEventListener('load', () => {
+        const inputs = document.querySelectorAll('input, textarea');
+        document.body.addEventListener('focusin', (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                document.body.classList.add('keyboard-open');
+            }
+        });
+        document.body.addEventListener('focusout', () => {
+            document.body.classList.remove('keyboard-open');
+        });
+    });
+
+    window.closeClichePopup = () => {
+        const popup = document.getElementById('cliche-popup');
+        document.getElementById('cliche-popup-content').classList.remove('scale-100');
+        document.getElementById('cliche-popup-content').classList.add('scale-95');
+        setTimeout(() => {
+            popup.classList.remove('flex');
+            popup.classList.add('hidden');
+        }, 200);
+    };
+
+    window.startVideoRecord = async (fieldId) => {
+        try {
+            if(recordTimerInterval) clearInterval(recordTimerInterval);
+            activeStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const videoPreview = document.getElementById(`preview-${fieldId}`);
+            videoPreview.srcObject = activeStream;
+            videoPreview.play();
+            videoPreview.muted = true;
+            videoPreview.classList.remove('hidden');
+            
+            showVideoRoast(fieldId, 'start');
+
+            mediaRecorder = new MediaRecorder(activeStream);
+            recordedChunks = [];
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                answers[fieldId] = blob; 
+                videoPreview.srcObject = null;
+                videoPreview.src = URL.createObjectURL(blob);
+                videoPreview.muted = false;
+                videoPreview.controls = true;
+                document.getElementById(`recorder-controls-${fieldId}`).classList.add('hidden');
+                document.getElementById(`recording-status-${fieldId}`).classList.add('hidden');
+                document.getElementById(`retake-${fieldId}`).classList.remove('hidden');
+                if(activeStream) activeStream.getTracks().forEach(track => track.stop());
+                if(recordTimerInterval) clearInterval(recordTimerInterval);
+                
+                showVideoRoast(fieldId, 'capture');
+            };
+            mediaRecorder.start();
+            document.getElementById(`recorder-controls-${fieldId}`).classList.add('hidden');
+            document.getElementById(`recording-status-${fieldId}`).classList.remove('hidden');
+            let seconds = 0;
+            const timerEl = document.getElementById(`timer-${fieldId}`);
+            timerEl.innerText = "00:00";
+            recordTimerInterval = setInterval(() => {
+                seconds++;
+                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                timerEl.innerText = `${mins}:${secs}`;
+                if(seconds >= 120) stopVideoRecord(fieldId);
+            }, 1000);
+        } catch (err) {
+            console.error("Error: " + err);
+            alert("Camera permission denied.");
+        }
+    };
+
+    window.stopVideoRecord = (fieldId) => {
+        if(mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            if(recordTimerInterval) clearInterval(recordTimerInterval);
+        }
+    };
+
+    window.resetRecording = (fieldId) => {
+        answers[fieldId] = null;
+        const videoPreview = document.getElementById(`preview-${fieldId}`);
+        videoPreview.classList.add('hidden');
+        videoPreview.src = "";
+        document.getElementById(`recorder-controls-${fieldId}`).classList.remove('hidden');
+        document.getElementById(`recording-status-${fieldId}`).classList.add('hidden');
+        document.getElementById(`retake-${fieldId}`).classList.add('hidden');
+        document.getElementById(`timer-${fieldId}`).innerText = "00:00";
+        
+        showVideoRoast(fieldId, 'retry');
+    };
+
+    function renderSkillsHTML(domain) {
+        const skills = SKILL_SETS[domain] || SKILL_SETS['Tech'];
+        let html = `<label class="block font-bold text-xs text-studio-gray uppercase tracking-widest mb-3">Your Arsenal (Select all that apply) <span class="text-studio-accent">*</span></label><div class="flex flex-wrap gap-3">`;
+        skills.forEach(skill => {
+            const isActive = (answers.skills_list || []).includes(skill);
+            html += `<button type="button" onclick="toggleSkill('${skill}', this)" class="skill-pill px-5 py-2 border rounded-full text-xs font-bold uppercase tracking-wider ${isActive ? 'bg-studio-black text-white border-studio-black scale-105 shadow-lg' : 'bg-transparent text-studio-gray border-zinc-200 hover:border-studio-black hover:text-studio-black'}">${skill}</button>`;
+        });
+        html += `</div><div id="error-skills" class="text-studio-accent text-xs font-bold mt-2 hidden uppercase tracking-wide">Pick at least one skill</div>`;
+        return html;
+    }
+
+    function renderStep(index) {
+        const step = steps[index];
+        localStorage.setItem('ingenuity_reg_index', index);
+        document.getElementById('progress-bar').style.width = `${((index + 1) / steps.length) * 100}%`;
+        document.getElementById('step-label').innerText = step.title;
+        document.getElementById('step-counter').innerText = `0${index + 1} / 0${steps.length}`;
+        
+        prevBtn.classList.toggle('hidden', index === 0);
+        
+        if (index === steps.length - 1) {
+            nextBtn.innerHTML = `Finish & Submit <span class="group-hover:translate-x-1 transition-transform">→</span>`;
+        } else {
+            nextBtn.innerHTML = `Continue <span class="group-hover:translate-x-1 transition-transform">→</span>`;
+        }
+
+        let html = `<div class="animate-slide-up">
+            <h2 class="text-4xl font-display font-bold text-studio-black mb-3 tracking-tighter leading-tight">${step.title}</h2>
+            <p class="text-studio-gray mb-10 text-lg font-normal leading-relaxed">${step.subtitle}</p>`;
+
+        if (step.type === 'mixed-parser') {
+            html += `<div class="space-y-10">`;
+            html += `<div class="bg-zinc-50 border border-zinc-200 rounded-lg p-8 text-center relative group hover:border-studio-accent transition-colors cursor-pointer"><input type="file" id="resume-upload" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="parseResume(this, '${step.mode}')"><div id="resume-ui-content"><div class="text-3xl mb-3 opacity-50">⚡</div><div class="font-bold text-studio-black uppercase tracking-wider text-sm">Auto-fill via Resume</div><div class="text-xs text-studio-gray mt-1 font-mono">PDF Formats only</div></div><div id="resume-loading" class="hidden flex flex-col items-center justify-center"><div class="loader mb-2"></div><div class="text-xs font-mono text-studio-gray uppercase">Analyzing Data...</div></div></div>`;
+            
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">`;
+            if (step.mode === 'academic') {
+                html += `<div class="md:col-span-2 relative group"><label class="block font-bold text-xs text-studio-gray uppercase tracking-widest mb-1 group-focus-within:text-studio-accent transition-colors">University</label><input type="text" id="uni" value="${answers.uni||''}" class="w-full bg-transparent border-b-2 border-zinc-200 py-3 text-xl font-medium text-studio-black placeholder:text-zinc-300 focus:border-studio-accent transition-colors" placeholder="e.g. Sister Nivedita University" oninput="save('uni', this.value)"></div><div class="md:col-span-2 relative group"><label class="block font-bold text-xs text-studio-gray uppercase tracking-widest mb-1 group-focus-within:text-studio-accent transition-colors">Course / Stream</label><input type="text" id="stream" value="${answers.stream||''}" class="w-full bg-transparent border-b-2 border-zinc-200 py-3 text-xl font-medium text-studio-black placeholder:text-zinc-300 focus:border-studio-accent transition-colors" placeholder="e.g. Computer Science" oninput="save('stream', this.value)"></div>`;
+            }
+            if (step.contactFields) {
+                step.contactFields.forEach(field => {
+                    const colSpan = field.width === 'full' ? 'md:col-span-2' : 'md:col-span-1';
+                    const isVerified = answers[field.id + '_verified'];
+                    const inputModeAttr = field.inputmode ? `inputmode="${field.inputmode}"` : '';
+                    let onInputEvents = `save('${field.id}', this.value); handleInputRoast('${field.id}', this);`;
+                    if (['email', 'phone'].includes(field.id)) onInputEvents += ` debouncedContactCheck('${field.id}', this.value);`;
+
+                    html += `<div class="${colSpan} relative group"><label class="block font-bold text-xs text-studio-gray uppercase tracking-widest mb-1 group-focus-within:text-studio-accent transition-colors">${field.label} ${field.required?'<span class="text-studio-accent">*</span>':''}</label>`;
+                    html += `<div class="relative"><input type="${field.type}" id="${field.id}" value="${answers[field.id] || ''}" ${inputModeAttr} class="w-full bg-transparent border-b-2 border-zinc-200 py-3 text-lg font-medium text-studio-black placeholder:text-zinc-300 focus:border-studio-accent transition-colors ${isVerified ? 'border-green-500 text-green-700' : ''}" placeholder="${field.placeholder}" oninput="${onInputEvents}" onblur="handleBlurRoast('${field.id}', this)" ${isVerified ? 'readonly' : ''}>${isVerified ? `<span class="absolute right-0 top-4 text-green-600 font-bold text-xs uppercase tracking-widest">Verified</span>` : ''}</div>`;
+                    if (field.verify && !isVerified) html += `<button type="button" onclick="triggerOtp('${field.id}')" id="btn-get-${field.id}" class="mt-3 text-[10px] font-bold bg-zinc-100 text-studio-black px-3 py-2 rounded hover:bg-zinc-200 transition uppercase tracking-wider">Send Code</button>`;
+                    html += `<div id="otp-container-${field.id}" class="hidden mt-4 p-4 bg-zinc-50 border border-zinc-200 rounded animate-slide-up"><p class="text-xs text-studio-gray mb-3 font-mono">ENTER CODE:</p><div class="flex flex-col gap-3"><input type="text" id="otp-input-${field.id}" maxlength="6" class="w-full bg-white border border-zinc-300 p-3 text-center font-bold tracking-[0.5em] focus:border-studio-black outline-none rounded" placeholder="000000"><button type="button" onclick="verifyOtp('${field.id}')" class="w-full bg-studio-black text-white font-bold py-3 rounded text-xs uppercase hover:bg-studio-accent transition-colors">Confirm</button></div><div id="otp-msg-${field.id}" class="text-xs mt-2 font-bold uppercase text-center"></div></div>`;
+                    html += `<div id="error-${field.id}" class="text-studio-accent text-xs font-bold mt-2 hidden uppercase tracking-wide"></div>`;
+                    html += `</div>`;
+                });
+            }
+            html += `</div></div>`;
+        }
+        else if (step.type === 'form-group' || step.type === 'hybrid-profile') {
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">`;
+            step.fields.forEach(field => {
+                const colSpan = field.width === 'full' ? 'md:col-span-2' : 'md:col-span-1';
+                html += `<div class="${colSpan} relative group"><label class="block font-bold text-xs text-studio-gray uppercase tracking-widest mb-1 group-focus-within:text-studio-accent transition-colors">${field.label} ${field.required && field.required !== false ?'<span class="text-studio-accent">*</span>':''}</label>`;
+                if (field.note) html += `<p class="text-[10px] text-studio-gray mb-2 font-mono">${field.note}</p>`;
+
+                if (field.type === 'textarea') {
+                    html += `<textarea id="${field.id}" maxlength="${field.maxChars}" class="w-full bg-transparent border-b-2 border-zinc-200 py-3 text-lg font-medium text-studio-black placeholder:text-zinc-300 focus:border-studio-accent transition-colors resize-none h-24" placeholder="${field.placeholder}" oninput="save('${field.id}', this.value); updateCount('${field.id}', ${field.maxChars}); handleInputRoast('${field.id}', this)" onblur="handleBlurRoast('${field.id}', this)">${answers[field.id] || ''}</textarea><div class="text-[10px] font-mono text-right mt-1 text-studio-gray"><span id="count-${field.id}">${(answers[field.id]||'').length}</span>/${field.maxChars}</div>`;
+                }
+                else if (field.type === 'chips-single') {
+                    html += `<div class="flex flex-wrap gap-2 mt-2">`;
+                    field.options.forEach(opt => { const isSel = answers[field.id] === opt; html += `<button type="button" onclick="handleChipClick('${field.id}', '${opt}', this)" class="px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all ${isSel ? 'bg-studio-black text-white border-studio-black' : 'bg-transparent text-studio-gray border-zinc-200 hover:border-studio-black hover:text-studio-black'}">${opt}</button>`; });
+                    html += `</div><input type="hidden" id="${field.id}" value="${answers[field.id]||''}">`;
+                    html += `<div id="error-${field.id}" class="text-studio-accent text-xs font-bold mt-2 hidden uppercase tracking-wide"></div>`;
+                }
+                else if (field.type === 'video-capture') {
+                    html += `<div class="border-2 border-dashed border-zinc-200 rounded-xl p-6 text-center transition-all hover:border-studio-black group relative" id="recorder-container-${field.id}"><video id="preview-${field.id}" class="w-full rounded-lg mb-4 hidden bg-black aspect-video" controls playsinline></video><div id="recorder-controls-${field.id}" class="space-y-3"><div class="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-studio-accent group-hover:text-white transition-colors"><span class="text-2xl">📹</span></div><h3 class="font-bold text-sm uppercase tracking-wider">Record Video</h3><p class="text-xs text-studio-gray font-mono">Max 2 Minutes • Browser Native</p><button type="button" onclick="startVideoRecord('${field.id}')" class="bg-studio-black text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform">Start Recording</button></div><div id="recording-status-${field.id}" class="hidden flex flex-col items-center justify-center space-y-3"><div class="animate-pulse text-red-600 font-bold font-mono tracking-widest text-xs">● RECORDING <span id="timer-${field.id}">00:00</span></div><button type="button" onclick="stopVideoRecord('${field.id}')" class="border border-red-500 text-red-500 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-50">Stop Recording</button></div><button type="button" id="retake-${field.id}" onclick="resetRecording('${field.id}')" class="hidden mt-4 text-xs font-bold text-studio-gray underline hover:text-studio-black uppercase">Retake</button></div>`;
+                }
+                else if (field.type === 'multi-link') {
+                    html += `<div class="flex gap-2 mb-3"><input type="url" id="new-link-input" class="flex-1 bg-transparent border-b-2 border-zinc-200 py-2 text-sm font-medium focus:border-studio-accent" placeholder="${field.placeholder}"><button type="button" onclick="addLink()" class="bg-zinc-100 hover:bg-zinc-200 text-studio-black font-bold px-4 rounded text-lg">+</button></div><div id="links-list" class="space-y-2">`;
+                    if (answers.extra_links && answers.extra_links.length > 0) {
+                        answers.extra_links.forEach((link, i) => {
+                            html += `<div class="flex justify-between items-center bg-zinc-50 p-2 rounded border border-zinc-100 text-xs font-mono"><span class="truncate max-w-[200px]">${link}</span><button type="button" onclick="removeLink(${i})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button></div>`;
+                        });
+                    }
+                    html += `</div>`;
+                }
+                else {
+                    const isVerified = answers[field.id + '_verified'];
+                    const inputModeAttr = field.inputmode ? `inputmode="${field.inputmode}"` : '';
+                    let onInputEvents = `save('${field.id}', this.value); handleInputRoast('${field.id}', this);`;
+                    if (['email', 'phone'].includes(field.id)) onInputEvents += ` debouncedContactCheck('${field.id}', this.value);`;
+
+                    html += `<div class="relative"><input type="${field.type}" id="${field.id}" value="${answers[field.id] || ''}" ${inputModeAttr} class="w-full bg-transparent border-b-2 border-zinc-200 py-3 text-lg font-medium text-studio-black placeholder:text-zinc-300 focus:border-studio-accent transition-colors ${isVerified ? 'border-green-500 text-green-700' : ''}" placeholder="${field.placeholder}" oninput="${onInputEvents}" onblur="handleBlurRoast('${field.id}', this)" ${isVerified ? 'readonly' : ''} ${field.type === 'password' ? `onkeyup="checkStrength(this.value)"` : ''}>${isVerified ? `<span class="absolute right-0 top-4 text-green-600 font-bold text-xs uppercase tracking-widest">Verified</span>` : ''}</div>`;
+                    if (field.verify && !isVerified) html += `<button type="button" onclick="triggerOtp('${field.id}')" id="btn-get-${field.id}" class="mt-3 text-[10px] font-bold bg-zinc-100 text-studio-black px-3 py-2 rounded hover:bg-zinc-200 transition uppercase tracking-wider">Send Code</button>`;
+                    html += `<div id="otp-container-${field.id}" class="hidden mt-4 p-4 bg-zinc-50 border border-zinc-200 rounded animate-slide-up"><p class="text-xs text-studio-gray mb-3 font-mono">ENTER CODE:</p><div class="flex flex-col gap-3"><input type="text" id="otp-input-${field.id}" maxlength="6" class="w-full bg-white border border-zinc-300 p-3 text-center font-bold tracking-[0.5em] focus:border-studio-black outline-none rounded" placeholder="000000"><button type="button" onclick="verifyOtp('${field.id}')" class="w-full bg-studio-black text-white font-bold py-3 rounded text-xs uppercase hover:bg-studio-accent transition-colors">Confirm</button></div><div id="otp-msg-${field.id}" class="text-xs mt-2 font-bold uppercase text-center"></div></div>`;
+                    html += `<div id="error-${field.id}" class="text-studio-accent text-xs font-bold mt-2 hidden uppercase tracking-wide"></div>`;
+                    if(field.type === 'password') html += `<div id="pass-strength" class="h-[2px] bg-zinc-100 mt-2 w-full hidden"><div id="strength-bar" class="h-full bg-studio-accent w-0 transition-all duration-500"></div></div>`;
+                }
+                html += `</div>`;
+            });
+            html += `</div>`;
+            
+            if (step.type === 'hybrid-profile') {
+                const showSkills = !!answers.domain;
+                const containerClasses = showSkills 
+                    ? "mt-8 pt-8 border-t border-dashed border-zinc-200 animate-fade-in" 
+                    : "hidden mt-8 pt-8 border-t border-dashed border-zinc-200";
+
+                html += `<div id="skills-container" class="${containerClasses}">`;
+                if(showSkills) {
+                    html += renderSkillsHTML(answers.domain);
+                }
+                html += `</div>`;
+            }
+        }
+        
+        html += `</div>`;
+        container.innerHTML = html;
+        nextBtn.classList.remove('hidden');
+    }
+
+    window.toggleSkill = (skill, el) => {
+        if (!answers.skills_list) answers.skills_list = [];
+        const idx = answers.skills_list.indexOf(skill);
+        if (idx === -1) {
+            answers.skills_list.push(skill);
+            el.classList.add('bg-studio-black', 'text-white', 'border-studio-black', 'scale-105', 'shadow-lg');
+            el.classList.remove('bg-transparent', 'text-studio-gray', 'border-zinc-200');
+        } else {
+            answers.skills_list.splice(idx, 1);
+            el.classList.remove('bg-studio-black', 'text-white', 'border-studio-black', 'scale-105', 'shadow-lg');
+            el.classList.add('bg-transparent', 'text-studio-gray', 'border-zinc-200');
+        }
+        localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+    };
+    
+    window.addLink = () => {
+        const inp = document.getElementById('new-link-input');
+        const val = inp.value.trim();
+        if(val && PATTERNS.url.test(val)) {
+            if(!answers.extra_links) answers.extra_links = [];
+            answers.extra_links.push(val);
+            localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+            inp.value = '';
+            const list = document.getElementById('links-list');
+            list.innerHTML = answers.extra_links.map((link, i) => `<div class="flex justify-between items-center bg-zinc-50 p-2 rounded border border-zinc-100 text-xs font-mono"><span class="truncate max-w-[200px]">${link}</span><button type="button" onclick="removeLink(${i})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button></div>`).join('');
+        } else {
+            alert("Please enter a valid URL");
+        }
+    };
+
+    window.removeLink = (index) => {
+        answers.extra_links.splice(index, 1);
+        localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+        const list = document.getElementById('links-list');
+        list.innerHTML = answers.extra_links.map((link, i) => `<div class="flex justify-between items-center bg-zinc-50 p-2 rounded border border-zinc-100 text-xs font-mono"><span class="truncate max-w-[200px]">${link}</span><button type="button" onclick="removeLink(${i})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button></div>`).join('');
+    };
+
+    window.updateCount = (id, max) => { document.getElementById(`count-${id}`).innerText = document.getElementById(id).value.length; };
+
+    window.handleChipClick = (id, val, btn) => {
+        answers[id] = val;
+        localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+        Array.from(btn.parentElement.children).forEach(b => {
+            b.className = 'px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-transparent text-studio-gray border-zinc-200 hover:border-studio-black hover:text-studio-black';
+        });
+        btn.className = 'px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-studio-black text-white border-studio-black';
+        if (id === 'domain') {
+            const skillContainer = document.getElementById('skills-container');
+            if (skillContainer) {
+                skillContainer.classList.remove('hidden');
+                skillContainer.classList.remove('animate-fade-in');
+                void skillContainer.offsetWidth; 
+                answers.skills_list = [];
+                localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+                skillContainer.innerHTML = renderSkillsHTML(val);
+                skillContainer.classList.add('animate-fade-in');
+            }
+        }
+    };
+
+    window.save = (id, val) => {
+        answers[id] = val;
+        if(id !== 'loom_walkthrough' && id !== 'hype_video' && id !== 'resumeFile') {
+             localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+        }
+    };
+
+    window.parseResume = async (input, mode) => {
+        const ui = document.getElementById('resume-ui-content');
+        const loading = document.getElementById('resume-loading');
+        if(input.files && input.files[0]) {
+            const file = input.files[0];
+            answers.resumeFile = file; 
+            ui.classList.add('hidden'); loading.classList.remove('hidden'); loading.classList.add('flex');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let fullText = "";
+                for(let i=1; i<=Math.min(2, pdf.numPages); i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const items = textContent.items.map(item => item.str.replace(/[•\u2022\u2023\u25E6\u2043\u2212\-\*]/g, " ").trim()).filter(s => s.length > 0);
+                    fullText += items.join(" ") + " ";
+                }
+                const emailMatch = fullText.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/); 
+                if(emailMatch) { answers.email = emailMatch[0]; if(document.getElementById('email')) document.getElementById('email').value = emailMatch[0]; }
+                const phoneMatch = fullText.match(/(\+91[\-\s]?)?[6-9]\d{9}/); 
+                if(phoneMatch) { answers.phone = phoneMatch[0]; if(document.getElementById('phone')) document.getElementById('phone').value = phoneMatch[0]; }
+                const page1 = await pdf.getPage(1); const textContent1 = await page1.getTextContent();
+                let name = ""; const ignoreWords = ["RESUME", "CV", "CURRICULUM", "VITAE", "PROFILE", "CONTACT", "SUMMARY", "EDUCATION", "WORK"];
+                for(let item of textContent1.items) { const str = item.str.trim().replace(/[•\-\*]/g, ''); if(str.length > 2 && !ignoreWords.some(w => str.toUpperCase().includes(w)) && !str.includes("@") && !/[0-9]/.test(str)) { name = str; break; } }
+                if(name) { answers.name = name; if(document.getElementById('name')) document.getElementById('name').value = name; }
+                let foundCity = ""; for(let city of COMMON_CITIES) { if(new RegExp(`\\b${city}\\b`, 'i').test(fullText)) { foundCity = city; break; } } 
+                if(foundCity) { answers.city = foundCity; if(document.getElementById('city')) document.getElementById('city').value = foundCity; }
+
+                if (mode === 'academic') {
+                    let foundMajor = ""; for(let major of COMMON_MAJORS) { if(new RegExp(`\\b${major}\\b`, 'i').test(fullText)) { foundMajor = major; break; } }
+                    if(!foundMajor) { for(let degree of COMMON_DEGREES) { if(new RegExp(`\\b${degree.replace('.','\\.').replace('.','\\.')}\\b`, 'i').test(fullText)) { foundMajor = degree; break; } } }
+                    if(foundMajor) { document.getElementById('stream').value = foundMajor; answers.stream = foundMajor; }
+                    let uni = ""; const uniKeywords = ["Institute of", "University", "College", "IIT", "NIT", "BITS", "Academy"]; const sentences = fullText.split(/[\.\n]/);
+                    for(let s of sentences) { if(uniKeywords.some(k => s.includes(k))) { let cleanS = s.split(/[,|(-]/)[0].split(/India/i)[0].split(/Bachelor|Master|B\.Tech|M\.Tech|Diploma/i)[0].trim(); COMMON_CITIES.forEach(city => { cleanS = cleanS.replace(new RegExp(`\\s${city}$`, 'i'), ""); }); uni = cleanS.trim(); break; } }
+                    if(uni) { document.getElementById('uni').value = uni; answers.uni = uni; }
+                }
+                localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers));
+                loading.innerHTML = `<div class="text-green-600 text-3xl mb-1">✓</div><div class="font-bold text-studio-black uppercase">Success</div>`;
+                setTimeout(() => { loading.classList.add('hidden'); ui.innerHTML = `<div class="text-3xl mb-1">✓</div><div class="font-bold text-studio-black text-xs uppercase">Resume Parsed</div>`; ui.classList.remove('hidden'); }, 1000);
+            } catch (error) { console.error(error); loading.innerHTML = `<div class="text-studio-accent text-xs">Error</div>`; }
+        }
+    };
+
+    window.handleInputRoast = (id, el) => {
+        const val = el.value;
+        if(['brag','failure','motivation', 'dream_job'].includes(id) && val.length > 80) showRoast(id,'long');
+        if(id === 'brag' && val.length > 150) showRoast(id,'extra');
+        if(id === 'failure' && val.length > 40 && val.length < 90) showRoast(id,'funny');
+        if(id === 'motivation' && val.length > 40 && val.length < 80) showRoast(id,'hype');
+        
+        if(id === 'password') {
+            if (val.length >= 6 && val.length < 10) showRoast(id, 'medium');
+            else if (val.length >= 10 && /[0-9]/.test(val)) showRoast(id, 'long');
+        }
+        
+        if(id === 'instagram'){
+            if(val.length > 5 && !val.includes('instagram.com')) showRoast(id,'invalid');
+            else if(PATTERNS.instagram.test(val)) showRoast(id,'valid');
+        }
+    };
+
+    window.handleBlurRoast = (id, el) => { 
+        if(!el.value) showRoast(id, 'empty'); 
+        if(id === 'password' && el.value.length < 5 && el.value.length > 0) showRoast(id, 'short'); 
+        if(id === 'brag' && el.value.length > 0 && el.value.length < 20) showRoast(id, 'short'); 
+    };
+
+    window.debouncedContactCheck = (fieldId, val) => {
+        const errDiv = document.getElementById(`error-${fieldId}`);
+        const btn = document.getElementById(`btn-get-${fieldId}`);
+        if(contactCheckTimers[fieldId]) clearTimeout(contactCheckTimers[fieldId]);
+        contactCheckTimers[fieldId] = setTimeout(async () => {
+            if(!val || (fieldId==='email' && !PATTERNS.email.test(val)) || (fieldId==='phone' && val.length < 10)) return;
+            try {
+                const response = await fetch('http://localhost:5000/api/check-contact', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [fieldId]: val })
+                });
+                const data = await response.json();
+                if (!data.available) {
+                    errDiv.innerText = "ALREADY REGISTERED"; errDiv.classList.remove('hidden'); if(btn) btn.disabled = true; answers[fieldId + '_taken'] = true;
+                } else {
+                    errDiv.classList.add('hidden'); if(btn) btn.disabled = false; answers[fieldId + '_taken'] = false;
+                }
+            } catch (e) { console.error(e); }
+        }, 800);
+    };
+
+    // --- HARD CHECK ON OTP BUTTON ---
+    window.triggerOtp = async (fieldId) => { 
+        const val = answers[fieldId]; 
+        if(!val || (fieldId==='email' && !PATTERNS.email.test(val))) { alert("Please enter a valid "+fieldId); return; } 
+        
+        const btn = document.getElementById(`btn-get-${fieldId}`); 
+        btn.innerHTML = "CHECKING..."; btn.disabled = true; 
+
+        // Force check database before even sending OTP
+        try {
+            const response = await fetch('http://localhost:5000/api/check-contact', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [fieldId]: val })
+            });
+            const data = await response.json();
+            if (!data.available) {
+                answers[fieldId+'_taken'] = true;
+                const err = document.getElementById(`error-${fieldId}`);
+                if(err) { err.innerText = "ALREADY REGISTERED"; err.classList.remove('hidden'); }
+                btn.innerHTML = "SEND CODE"; 
+                // Keep disabled until they change the input
+                return;
+            } else {
+                answers[fieldId+'_taken'] = false;
+            }
+        } catch(e) { console.error(e); }
+
+        btn.innerHTML="SENDING..."; 
+        const code=Math.floor(100000+Math.random()*900000).toString(); verificationCodes[fieldId]=code; 
+        if(fieldId==='email'){ 
+            try {
+                await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.OTP_TEMPLATE_ID, {to_email:val, passcode:code, to_name:answers.name||'User'});
+            } catch(e){console.error(e);} 
+        } else { alert("SMS Simulator: Your code is "+code); } 
+        
+        document.getElementById(`otp-container-${fieldId}`).classList.remove('hidden'); 
+        btn.innerHTML="RESEND"; btn.disabled=false; 
+    };
+
+    window.verifyOtp = (fieldId) => { if(document.getElementById(`otp-input-${fieldId}`).value===verificationCodes[fieldId]){ answers[fieldId+'_verified']=true; localStorage.setItem('ingenuity_reg_data', JSON.stringify(answers)); document.getElementById(`otp-msg-${fieldId}`).innerHTML="<span class='text-green-600'>VERIFIED</span>"; setTimeout(()=>renderStep(currentStepIndex),800); } else { document.getElementById(`otp-msg-${fieldId}`).innerHTML="<span class='text-studio-accent'>INVALID CODE</span>"; } };
+    window.checkStrength = (val) => { const bar=document.getElementById('strength-bar'); document.getElementById('pass-strength').classList.remove('hidden'); let s=0; if(val.length>5)s++; if(val.length>8)s++; if(/[0-9]/.test(val))s++; bar.className = `h-full transition-all ${s===3?'bg-green-500':s===2?'bg-yellow-500':'bg-studio-accent'}`; bar.style.width = s===0?'10%':s===1?'30%':s===2?'60%':'100%'; };
+    
+    nextBtn.onclick = async (e) => {
+        if (e) e.preventDefault(); 
+        const step = steps[currentStepIndex];
+        let valid = true;
+
+        // --- CLICHE CHECKER LOGIC ---
+        if (step.id === 'merged_vibe') {
+            let foundCliche = false;
+            let blockedWord = "";
+            ['brag', 'failure', 'motivation', 'dream_job'].forEach(id => {
+                const val = (answers[id] || "").toLowerCase();
+                BANNED_PHRASES.forEach(phrase => {
+                    if (val.includes(phrase.toLowerCase())) {
+                        foundCliche = true;
+                        blockedWord = phrase;
+                    }
+                });
+            });
+
+            if (foundCliche) {
+                document.getElementById('cliche-word').innerText = `"${blockedWord}"`;
+                document.getElementById('cliche-popup').classList.remove('hidden');
+                document.getElementById('cliche-popup').classList.add('flex');
+                setTimeout(() => { 
+                    document.getElementById('cliche-popup-content').classList.remove('scale-95'); 
+                    document.getElementById('cliche-popup-content').classList.add('scale-100'); 
+                }, 10);
+                valid = false;
+            }
+        }
+
+        if (step.id === 'merged_profile') {
+            if(!answers.domain) { document.getElementById('error-domain').classList.remove('hidden'); valid = false; alert("Please select a Domain"); }
+            if(!answers.skills_list || answers.skills_list.length === 0) { document.getElementById('error-skills').classList.remove('hidden'); valid = false; }
+        }
+        else if (step.type === 'mixed-parser') {
+            if(!answers.uni || !answers.stream) { alert("Please check University details"); valid=false; }
+            if(step.contactFields) {
+                // --- HARD CHECK ON CONTINUE BUTTON ---
+                // Using for...of so we can await the API calls safely
+                for (const f of step.contactFields) {
+                    const el = document.getElementById(f.id);
+                    const err = document.getElementById(`error-${f.id}`);
+                    const val = el.value.trim();
+                    if(err) err.classList.add('hidden');
+                    if (f.required && !val) { if(err){err.innerText = "REQUIRED"; err.classList.remove('hidden');} valid = false; }
+                    if(val) { if(f.id === 'email' && !PATTERNS.email.test(val)) { err.innerText = "INVALID EMAIL"; err.classList.remove('hidden'); valid=false; } }
+                    
+                    // Final safety API check before allowing them to slide to Step 4
+                    if ((f.id === 'email' || f.id === 'phone') && val && valid) {
+                        try {
+                            const res = await fetch('http://localhost:5000/api/check-contact', {
+                                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ [f.id]: val })
+                            });
+                            const data = await res.json();
+                            if (!data.available) {
+                                answers[f.id+'_taken'] = true;
+                                if(err) { err.innerText = "ALREADY REGISTERED"; err.classList.remove('hidden'); }
+                                valid = false;
+                            } else {
+                                answers[f.id+'_taken'] = false;
+                            }
+                        } catch(e) { console.error(e); }
+                    }
+
+                    if(f.verify && !answers[f.id+'_verified']) { err.innerText = "VERIFY FIRST"; err.classList.remove('hidden'); valid=false; }
+                }
+            }
+        }
+        else if (step.type === 'form-group' || step.type === 'hybrid-profile') {
+            for (const f of step.fields) {
+                if (f.type === 'multi-link') continue;
+                const el = document.getElementById(f.id);
+                const err = document.getElementById(`error-${f.id}`);
+                if (f.id === 'hype_video') continue; 
+                let val = (f.type === 'chips-single') ? answers[f.id] : el.value;
+                if (typeof val === 'string') val = val.trim();
+                if(err) err.classList.add('hidden');
+                if (f.required && !val) { if(err){err.innerText = "REQUIRED"; err.classList.remove('hidden');} valid = false; }
+                if(val && typeof val === 'string') {
+                    if(f.id === 'email' && !PATTERNS.email.test(val)) { err.innerText = "INVALID EMAIL"; err.classList.remove('hidden'); valid=false; }
+                    if(f.id === 'password' && (val.length <= 8 || !/[0-9]/.test(val))) { err.innerText = "WEAK PASSWORD"; err.classList.remove('hidden'); valid=false; }
+                }
+
+                if((f.id === 'email' || f.id === 'phone') && answers[f.id+'_taken']) { 
+                    if(err) { err.innerText = "ALREADY REGISTERED"; err.classList.remove('hidden'); } 
+                    valid = false; 
+                }
+                if(f.verify && !answers[f.id+'_verified']) { err.innerText = "VERIFY FIRST"; err.classList.remove('hidden'); valid=false; }
+            }
+        }
+
+        if (valid) {
+            if (currentStepIndex === steps.length - 1) { await submitForm(); } 
+            else {
+                stepHistory.push(currentStepIndex);
+                localStorage.setItem('ingenuity_reg_history', JSON.stringify(stepHistory));
+                currentStepIndex++; 
+                renderStep(currentStepIndex);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    };
+
+    prevBtn.onclick = (e) => {
+        if(e) e.preventDefault();
+        if (stepHistory.length > 0) {
+            currentStepIndex = stepHistory.pop();
+            localStorage.setItem('ingenuity_reg_history', JSON.stringify(stepHistory));
+            renderStep(currentStepIndex);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    async function submitForm() {
+    const nextBtn = document.getElementById('next-btn');
+    const mainContent = document.getElementById('main-content');
+    
+    nextBtn.innerText = "UPLOADING..."; 
+    nextBtn.disabled = true; 
+    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    try {
+        const formData = new FormData();
+        
+        for (const key in answers) {
+            if (['hype_video', 'resumeFile', 'photo_blob'].includes(key)) continue;
+            if (key.endsWith('_verified') || key.endsWith('_taken')) continue;
+
+            if (Array.isArray(answers[key])) { 
+                answers[key].forEach(item => formData.append(`${key}[]`, item)); 
+            } else if (answers[key] !== null && answers[key] !== undefined) {
+                formData.append(key, answers[key]); 
+            }
+        }
+
+        // Just in case the backend schema is stubborn, we inject a hidden username
+        if (!answers.username) {
+            const baseName = (answers.name || 'user').replace(/\s+/g, '').toLowerCase();
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            answers.username = `${baseName}${randomNum}`;
+            formData.append('username', answers.username);
+        }
+
+        if (answers.hype_video) {
+            formData.append('hype_video', answers.hype_video, `${answers.name || 'user'}_pitch.webm`);
+        }
+        if (answers.resumeFile) {
+            formData.append('resume', answers.resumeFile, answers.resumeFile.name);
+        }
+
+        const response = await fetch('http://localhost:5000/api/submit', {
+            method: 'POST',
+            body: formData 
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            localStorage.removeItem('ingenuity_reg_data');
+            localStorage.removeItem('ingenuity_reg_history');
+            localStorage.removeItem('ingenuity_reg_index');
+
+            try { 
+                await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.WELCOME_TEMPLATE_ID, { 
+                    to_name: answers.name, 
+                    to_email: answers.email, 
+                    reg_id: result.id 
+                }); 
+            } catch(e) { console.error("Email failed:", e); }
+
+            mainContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center pt-20 animate-fade-in text-center h-full">
+                    <div class="text-6xl mb-6">🚀</div>
+                    <h2 class="text-5xl font-display font-bold text-studio-black tracking-tighter mb-4">Congratulations, You're In.</h2>
+                    <div class="bg-zinc-100 border border-zinc-200 rounded-lg p-6 mb-8 max-w-sm w-full mx-auto">
+                        <p class="text-studio-gray text-xs font-mono uppercase tracking-widest mb-2">Registration ID</p>
+                        <p class="text-3xl font-bold text-studio-black font-display tracking-tight select-all">${result.id}</p>
+                    </div>
+                    <p class="text-studio-gray mb-10 text-sm max-w-md mx-auto leading-relaxed">Your application is securely stored. We've sent a confirmation to <b>${answers.email}</b>.</p>
+                    <a href="opportunities.html" class="bg-studio-black text-white px-10 py-5 rounded-full font-bold hover:bg-studio-accent hover:scale-105 transition-all shadow-xl inline-flex items-center gap-3 uppercase tracking-widest text-sm group">
+                        Explore Opportunities <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
+                </div>`;
+        } else { 
+            throw new Error(result.message || "Submission failed"); 
+        }
+    } catch (e) {
+        console.error("Submission Error:", e);
+        nextBtn.innerText = "Try Again"; 
+        nextBtn.disabled = false; 
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        alert("Error: " + e.message);
+    }
+}
+    renderStep(currentStepIndex);
+    </script>
+    
+</body>
+</html>

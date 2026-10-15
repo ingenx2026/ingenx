@@ -1,0 +1,5 @@
+[     328ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:4174/favicon.ico:0
+[  428307ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:1337/api/challenges:0
+[ 1151281ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:1337/api/challenges:0
+[ 1329697ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:1337/api/challenges:0
+[ 2518143ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:1337/api/challenges:0
