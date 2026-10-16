@@ -14,13 +14,19 @@ import Login from './pages/Login';
 import About from './pages/About'; 
 import Contact from './pages/Contact'; 
 
+import RoomExplore from './pages/RoomExplore';
+import CtaAnalytics from './components/CtaAnalytics';
+
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <ScrollToTop />
+        <CtaAnalytics />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/rooms" element={<RoomExplore />} />
+          <Route path="/rooms/:roomSlug" element={<RoomExplore />} />
           <Route path="/marketing-business" element={<MarketingBusiness />} />
           <Route path="/innovation" element={<Innovation />} />
           <Route path="/tech-hackathons" element={<TechHackathons />} />

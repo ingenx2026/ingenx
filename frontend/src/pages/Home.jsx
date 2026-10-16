@@ -1,8 +1,9 @@
+import { ROOM_PATHS } from '../data/rooms';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ImageWithFallback } from '../components/ImageWithFallback';
-import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal, Copy } from 'lucide-react';
+import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal } from 'lucide-react';
 
 // --- MEDIA IMPORTS ---
 import billboardImage from '../imports/Gemini_Generated_Image_1l2vfz1l2vfz1l2v.png';
@@ -51,7 +52,6 @@ import img7 from '../imports/img7.png';
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
 const PLACEHOLDER_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop";
 const GLOBAL_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop";
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const CATEGORY_COLORS = {
   Marketing: '#E92A39',
@@ -70,6 +70,17 @@ const CATEGORY_DATA = {
   Sustainability: { img: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=800&auto=format&fit=crop', desc: 'Green tech, decarbonisation, and eco-innovation.' },
   Innovation: { img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop', desc: 'Open-ended problem solving and lateral thinking.' }
 };
+
+// Anonymous preview copy. Original branded page is preserved in
+// frontend/archive/challenge-vault/Home.before-anonymous-vault.jsx.txt.
+const VAULT_TEASERS = [
+  { id: 'preview-ice-cream', category: 'Marketing', company: 'FOOD / THE ALL-YEAR CHALLENGE', title: "Who said ice cream gets a summer job?", description: 'Rainy Tuesdays. December nights. An ice cream brand wants in on all 12 months. Give people a reason to reach for a scoop beyond summer.' },
+  { id: 'preview-sunscreen', category: 'Design', company: 'BEAUTY / THE DAILY HABIT', title: 'SPF needs a personality transplant.', description: 'A beauty brand wants SPF out of the beach bag and into the daily routine. Make it the thing people reach for, not the thing they forget.' },
+  { id: 'preview-ev', category: 'Innovation', company: 'AUTO / BEYOND THE BATTERY', title: 'Dear EV brands, enough with the battery talk.', description: 'Range. Charging. Kilometres. We’ve heard it. An EV brand wants a story that makes India fall for the car. What would yours be?' },
+  { id: 'preview-cement', category: 'Sustainability', company: 'MATERIALS / A LIGHTER FOOTPRINT', title: 'The next skyline needs a smaller footprint.', description: 'A building materials brand wants to cut carbon without cutting corners. Find the change that could make the way we build worth rebuilding.' },
+  { id: 'preview-ai', category: 'Tech', company: 'TECH / THE POWER PROBLEM', title: 'AI has an energy bill. Someone has to fix it.', description: 'More AI. More demand. An energy solutions brand wants less waste in the system. Build an answer that works beyond the pitch deck.' },
+  { id: 'preview-steel', category: 'Marketing', company: 'BUILDING / THE INVISIBLE CHOICE', title: 'Dream homes have moodboards. Steel never makes them.', description: 'A construction brand wants first-time homeowners to care about what holds it all together. Make the invisible part of a home impossible to ignore.' },
+].map(teaser => ({ ...teaser, bgImage: CATEGORY_DATA[teaser.category].img }));
 
 // --- REWARDS DATA ---
 const PLATFORM_REWARDS = [
@@ -210,8 +221,11 @@ function PreRegistrationStatement() {
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let active = true;
     const updateReading = () => {
-      const bounds = sectionRef.current.getBoundingClientRect();
+      const section = sectionRef.current;
+      if (!active || !section?.isConnected) return;
+      const bounds = section.getBoundingClientRect();
       const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.85 - bounds.top) / (window.innerHeight * 0.65)));
       setWordsRead(media.matches ? PRE_REGISTER_WORDS.length : Math.ceil(progress * PRE_REGISTER_WORDS.length));
     };
@@ -220,6 +234,7 @@ function PreRegistrationStatement() {
     window.addEventListener('resize', updateReading);
     media.addEventListener('change', updateReading);
     return () => {
+      active = false;
       window.removeEventListener('scroll', updateReading);
       window.removeEventListener('resize', updateReading);
       media.removeEventListener('change', updateReading);
@@ -227,7 +242,7 @@ function PreRegistrationStatement() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="pre-registration-statement" className="relative flex items-center min-h-[70svh] bg-[#0b0b0b] px-6 md:px-12 lg:px-20 py-20 md:py-28">
+    <section data-cta-section="pre-registration-statement" ref={sectionRef} id="pre-registration-statement" className="relative flex flex-col justify-center items-center min-h-[70svh] bg-[#0b0b0b] px-6 md:px-12 lg:px-20 py-20 md:py-28">
       <style>{`
         #pre-registration-statement .reading-word { color: #525252; transition: color .3s ease; }
         #pre-registration-statement .reading-word.is-read { color: #fff4e8; }
@@ -238,7 +253,8 @@ function PreRegistrationStatement() {
           <span key={index} aria-hidden="true" className={`reading-word ${index < wordsRead ? 'is-read' : ''}`}>{word}{index < PRE_REGISTER_WORDS.length - 1 ? ' ' : ''}</span>
         ))}
       </h2>
-    </section>
+    <div className="relative z-10 mt-10 text-center"><PreRegisterCTA /></div>
+      </section>
   );
 }
 
@@ -293,12 +309,15 @@ function RegistrationLaunchBanner() {
   useEffect(() => {
     let dwellTimer = null;
     let fired = false;
+    let active = true;
     const clearDwell = () => {
       window.clearTimeout(dwellTimer);
       dwellTimer = null;
     };
     const checkVisibility = () => {
-      const bounds = bannerRef.current.getBoundingClientRect();
+      const banner = bannerRef.current;
+      if (!active || !banner?.isConnected) { clearDwell(); return; }
+      const bounds = banner.getBoundingClientRect();
       const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0));
       const stayingHere = !document.hidden && visibleHeight >= Math.min(bounds.height, window.innerHeight) * 0.7;
       if (!stayingHere) {
@@ -307,6 +326,7 @@ function RegistrationLaunchBanner() {
       } else if (!fired && dwellTimer === null) {
         dwellTimer = window.setTimeout(() => {
           dwellTimer = null;
+          if (!active || !bannerRef.current?.isConnected) return;
           fired = true;
           launchRocket();
         }, 3000);
@@ -318,6 +338,7 @@ function RegistrationLaunchBanner() {
     window.addEventListener('resize', scheduleCheck);
     document.addEventListener('visibilitychange', checkVisibility);
     return () => {
+      active = false;
       clearDwell();
       window.removeEventListener('scroll', scheduleCheck);
       window.removeEventListener('resize', scheduleCheck);
@@ -337,7 +358,7 @@ function RegistrationLaunchBanner() {
   }, []);
 
   return (
-    <section ref={bannerRef} id="registration-launch" aria-labelledby="registration-launch-title" className={`registration-launch ${launched ? 'is-launched' : ''} ${boosting ? 'is-boosting' : ''} ${motionPaused ? 'motion-paused' : ''}`}>
+    <section data-cta-section="registration-launch" ref={bannerRef} id="registration-launch" aria-labelledby="registration-launch-title" className={`registration-launch ${launched ? 'is-launched' : ''} ${boosting ? 'is-boosting' : ''} ${motionPaused ? 'motion-paused' : ''}`}>
       <style>{`
         .registration-launch { --launch-cream: #fff4e8; --launch-accent: #ff4b26; background: #0b0b0b; color: #fff4e8; overflow: hidden; position: relative; isolation: isolate; z-index: 70; min-height: 100svh; scroll-margin-top: 0; }
         .registration-launch::before, .registration-launch::after { content: ''; position: absolute; top: 0; bottom: 0; width: 50%; z-index: 8; background: #fff4e8; pointer-events: none; transform: scaleX(0); }
@@ -519,6 +540,9 @@ function RegistrationJourney() {
   useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
+    const progressElement = progressRef.current;
+    if (!section || !track || !progressElement) return;
+    let active = true;
     const rows = [...section.querySelectorAll('.journey-step')];
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     let frame = null;
@@ -526,14 +550,16 @@ function RegistrationJourney() {
 
     const updateProgress = () => {
       frame = null;
+      if (!active || !track.isConnected || !progressElement.isConnected) return;
       const bounds = track.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.7 - bounds.top) / bounds.height));
-      progressRef.current.style.transform = `scaleY(${media.matches ? 1 : progress})`;
+      const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.7 - bounds.top) / Math.max(1, bounds.height)));
+      progressElement.style.transform = `scaleY(${media.matches ? 1 : progress})`;
     };
     const onScroll = () => {
-      if (frame === null) frame = window.requestAnimationFrame(updateProgress);
+      if (active && frame === null) frame = window.requestAnimationFrame(updateProgress);
     };
     const observer = new IntersectionObserver(entries => {
+      if (!active) return;
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('journey-visible');
@@ -547,6 +573,7 @@ function RegistrationJourney() {
     window.addEventListener('resize', onScroll);
     media.addEventListener('change', onScroll);
     return () => {
+      active = false;
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
@@ -556,7 +583,7 @@ function RegistrationJourney() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="registration-journey" aria-labelledby="registration-journey-title" className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
+    <section data-cta-section="registration-journey" ref={sectionRef} id="registration-journey" aria-labelledby="registration-journey-title" className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
       <style>{`
         #registration-journey .journey-timeline { position: relative; margin: 0; padding: 0; list-style: none; }
         #registration-journey .journey-track { position: absolute; width: 2px; left: 30%; top: 0; bottom: 0; transform: translateX(-50%); background: #2A2A2E; overflow: hidden; }
@@ -618,6 +645,10 @@ function RegistrationJourney() {
 }
 
 // --- PAGE OPENING TRANSITION ---
+function PreRegisterCTA({ label = 'Pre-register' }) {
+  return <Link to="/register" className="inline-flex items-center justify-center gap-5 bg-[#ff4b26] text-white px-7 py-4 rounded-full text-sm font-black hover:bg-[#df3512] hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4b26]">{label} <span aria-hidden="true">↗</span></Link>;
+}
+
 function PageOpeningTransition() {
   const [opening, setOpening] = useState(true);
 
@@ -656,9 +687,6 @@ export default function Home() {
 
   const [opportunities, setOpportunities] = useState([]);
   const [isLoadingOpps, setIsLoadingOpps] = useState(true);
-  const [waitlistEmail, setWaitlistEmail] = useState('');
-  const [waitlistStatus, setWaitlistStatus] = useState('idle');
-  const [copied, setCopied] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
@@ -667,14 +695,13 @@ export default function Home() {
   const [heroVideoIndex, setHeroVideoIndex] = useState(0);
   const [processVideoIndex, setProcessVideoIndex] = useState(0); 
 
-  const waitlistRank = 2843;
 
   const heroVideos = [
      intervie, collaborating, chaos, celebration3
   ].filter(Boolean).map(src => ({ src })); 
 
-  const scrollToWaitlist = () => {
-    document.getElementById('waitlist-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const goToPreRegister = () => {
+    navigate('/register');
   };
 
   useEffect(() => {
@@ -785,23 +812,12 @@ export default function Home() {
         setIsLoadingOpps(false);
       }
     };
-    fetchPlatformData();
+    void fetchPlatformData; // Retained for the later brand reveal.
+    // Keep the branded data loader above for the later brand reveal.
+    // Preview mode deliberately does not fetch or render named challenges.
+    setOpportunities(VAULT_TEASERS);
+    setIsLoadingOpps(false);
   }, []);
-
-  const handleWaitlistJoin = async () => {
-    const trimmedEmail = waitlistEmail.trim();
-    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
-      setWaitlistStatus('error');
-      return;
-    }
-    setWaitlistStatus('submitting');
-    try {
-      await axios.post(`${API_URL}/api/waitlists`, { data: { email: trimmedEmail } }).catch(()=>{});
-      setWaitlistStatus('success');
-    } catch (err) {
-      setWaitlistStatus('success'); 
-    }
-  };
 
   const faqs = [
     { q: "Is this actually legit, or filler content?", a: "Bilkul legit. Every brief comes straight from a real brand with a real problem — win, and they might actually build your idea, not just hand you a PDF certificate." },
@@ -813,7 +829,7 @@ export default function Home() {
 
   const filteredOpportunities = opportunities.filter(opp => {
     const matchesFilter = activeFilter === 'All' || opp.category === activeFilter;
-    const matchesSearch = searchQuery === '' || opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) || opp.company?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = searchQuery === '' || opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) || opp.company?.toLowerCase().includes(searchQuery.toLowerCase()) || opp.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -848,7 +864,7 @@ export default function Home() {
       <div className="fixed top-0 w-full h-10 bg-[#0A0A0A]/80 backdrop-blur-md text-[#FAFAFA] px-4 md:px-6 text-center text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 md:gap-3 z-[60] border-b border-[#2A2A2E]">
         <span className="text-[#E92A39] animate-pulse">LIVE</span>
         <span className="hidden sm:inline">Launching this Dussehra in</span> {countdown.days}d {countdown.hours}h {countdown.minutes}m --
-        <button onClick={scrollToWaitlist} className="underline hover:text-[#E92A39] transition-colors">Join</button>
+        <button data-cta="home-announcement" onClick={goToPreRegister} className="underline hover:text-[#E92A39] transition-colors">Pre-register</button>
       </div>
 
       {/* NAVBAR */}
@@ -864,14 +880,14 @@ export default function Home() {
           <Link to="/about" className="hover:text-[#FAFAFA] transition-colors">About Us</Link>
         </div>
         <div className="w-auto md:w-48 flex justify-end">
-          <button onClick={scrollToWaitlist} className="bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-5 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm shadow-sm transition-colors">
+          <button data-cta="home-navigation" onClick={goToPreRegister} className="bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-5 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm shadow-sm transition-colors">
             Pre-register
           </button>
         </div>
       </nav>
 
       {/* 1. HERO SECTION & QUEUE MECHANIC */}
-      <section className="relative w-full min-h-[100dvh] flex items-start justify-center overflow-hidden bg-transparent pb-24 lg:pb-32 pt-[22vh] md:pt-[28vh]">
+      <section data-cta-section="home-hero" className="relative w-full min-h-[100dvh] flex items-start justify-center overflow-hidden bg-transparent pb-24 lg:pb-32 pt-[22vh] md:pt-[28vh]">
         <div className="absolute inset-0 bg-transparent">
           {heroVideos && heroVideos.length > 0 ? (
             <CrossfadeVideoPlayer clips={heroVideos} activeIndex={heroVideoIndex} poster={billboardImage} />
@@ -890,59 +906,9 @@ export default function Home() {
               </span>
             </h1>
             
-            {waitlistStatus !== 'success' ? (
-              <>
-                <p className="text-base md:text-2xl text-[#A1A1AA] mb-8 md:mb-10 max-w-xl font-bold animate-text-fade-up" style={{ animationDelay: '100ms' }}>
-                  Pre-register before Dussehra (October 20th) to get the first briefs the moment they drop.
-                </p>
-                <div id="waitlist-form" className="mt-4 md:mt-6 w-full scroll-mt-32 animate-text-fade-up" style={{ animationDelay: '200ms' }}>
-                  <div className="flex flex-col sm:flex-row gap-3 w-full max-w-lg">
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={waitlistEmail}
-                      onChange={(e) => { setWaitlistEmail(e.target.value); if (waitlistStatus === 'error') setWaitlistStatus('idle'); }}
-                      className={`flex-1 bg-black/40 backdrop-blur-md border ${waitlistStatus === 'error' ? 'border-[#E92A39]' : 'border-white/10'} text-white placeholder:text-[#71717A] px-5 py-3.5 md:px-6 md:py-4 rounded-full focus:outline-none focus:border-[#E92A39] font-bold text-sm md:text-base transition-colors shadow-inner`}
-                    />
-                    <button onClick={handleWaitlistJoin} disabled={waitlistStatus === 'submitting'} className="bg-[#E92A39] text-white px-8 py-3.5 md:py-4 rounded-full text-xs font-black uppercase tracking-widest shrink-0 hover:bg-[#ff3b4b] transition-colors disabled:opacity-60 shadow-lg">
-                      {waitlistStatus === 'submitting' ? 'Joining...' : 'Lock In'}
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div id="waitlist-form" className="mt-6 md:mt-8 w-full max-w-xl bg-[#151515]/90 backdrop-blur-md border border-[#2A2A2E] rounded-[2rem] p-6 md:p-8 shadow-2xl animate-text-fade-up">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <h3 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
-                    <CheckCircle2 className="w-6 h-6 text-[#10B981]" /> You're locked in.
-                  </h3>
-                  <span className="bg-[#10B981]/10 text-[#10B981] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-[#10B981]/20 w-fit">
-                    Rank #{waitlistRank.toLocaleString()}
-                  </span>
-                </div>
-                <p className="text-[#A1A1AA] text-sm md:text-base font-bold mb-6 leading-relaxed">
-                  The vault opens on Dussehra (Oct 20th). Want early access? Move up <strong className="text-white">50 spots</strong> for every peer who joins using your link.
-                </p>
-                <div className="flex items-center gap-2 bg-[#0A0A0A] p-1.5 md:p-2 rounded-xl border border-[#2A2A2E]">
-                  <input 
-                    type="text" 
-                    readOnly 
-                    value={`ingenuityx.com/join?ref=ix_${waitlistEmail.split('@')[0] || 'user'}`} 
-                    className="bg-transparent text-[#71717A] text-xs md:text-sm font-mono flex-1 px-3 outline-none truncate"
-                  />
-                  <button 
-                    onClick={() => { 
-                      navigator.clipboard.writeText(`ingenuityx.com/join?ref=ix_${waitlistEmail.split('@')[0] || 'user'}`); 
-                      setCopied(true); setTimeout(() => setCopied(false), 2000); 
-                    }}
-                    className="bg-[#2A2A2E] hover:bg-[#3f3f46] text-white px-4 py-2.5 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2 shrink-0"
-                  >
-                    {copied ? <CheckCircle2 className="w-3.5 h-3.5"/> : <Copy className="w-3.5 h-3.5"/>}
-                    {copied ? 'Copied' : 'Copy Link'}
-                  </button>
-                </div>
-              </div>
-            )}
+            <p className="text-base md:text-2xl text-[#A1A1AA] mb-8 max-w-xl font-bold">Your next opportunity starts here. Tell us what you love and what you want to do.</p>
+            <PreRegisterCTA />
+            <p className="text-sm text-[#A1A1AA] mt-4">About 60 seconds. A whole new set of possibilities.</p>
           </div>
         </div>
       </section>
@@ -952,7 +918,7 @@ export default function Home() {
       <RegistrationLaunchBanner />
 
       {/* 3. PICK YOUR LANE */}
-      <section className="py-12 md:py-16 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
+      <section data-cta-section="rooms" id="rooms" className="py-12 md:py-16 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
         <ScrollReveal>
           <div className="mb-8 md:mb-10 text-left">
             <h3 className="text-3xl md:text-5xl font-black tracking-tight text-white mb-2 md:mb-4">Find your vibe(and tribe)</h3>
@@ -969,7 +935,7 @@ export default function Home() {
             return (
               <ScrollReveal key={i} delay={i * 50} className="min-w-0 h-[280px] md:h-[360px]">
                 <div 
-                  onClick={() => { setActiveFilter(catName); document.getElementById('opportunities')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  onClick={() => navigate(`/rooms/${ROOM_PATHS[catName]}`)}
                   className="relative h-full w-full overflow-hidden group cursor-pointer transition-all duration-500 ease-out md:transform md:-skew-x-6 rounded-2xl md:rounded-2xl border border-[#2A2A2E] hover:border-transparent"
                 >
                   <div className="absolute md:inset-[-20%] md:w-[140%] inset-0 w-full h-full md:transform md:skew-x-6 pointer-events-none">
@@ -987,7 +953,7 @@ export default function Home() {
                   {/* Text Content */}
                   <div className="absolute inset-0 z-20 flex flex-col justify-end p-5 md:p-8 md:transform md:skew-x-6 pointer-events-none">
                     {/* Default View */}
-                    <div className="md:absolute md:bottom-6 md:left-8 md:right-6 transition-all duration-300 md:group-hover:opacity-0 md:group-hover:translate-y-4">
+                    <div className="md:absolute md:bottom-6 md:left-8 md:right-6 transition-all duration-300 md:group-hover:opacity-0 md:group-hover:translate-y-4 md:group-focus-within:opacity-0">
                       <h4 
                         className={`flex items-baseline gap-3 text-2xl md:text-xl font-black text-white uppercase drop-shadow-lg ${
                           catName.length > 10 
@@ -1001,8 +967,10 @@ export default function Home() {
                       </h4>
                     </div>
 
+                    <Link to={`/rooms/${ROOM_PATHS[catName]}`} onClick={event => event.stopPropagation()} className="md:hidden pointer-events-auto mt-4 inline-flex self-start items-center gap-6 rounded-full bg-white text-black px-5 py-2.5 text-sm font-black">Explore more <span aria-hidden="true">↗</span></Link>
+
                     {/* Desktop Hover Reveal */}
-                    <div className="hidden md:flex opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-200 flex-col items-start h-full justify-center w-full">
+                    <div className="hidden md:flex opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-500 delay-200 flex-col items-start h-full justify-center w-full">
                       <h4 className={`flex items-baseline gap-3 text-2xl font-black text-white mb-3 tracking-tight drop-shadow-lg ${
                         catName.length > 10 ? 'xl:text-3xl' : 'xl:text-4xl'
                       }`}>
@@ -1010,6 +978,7 @@ export default function Home() {
                         <span>{catName}</span>
                       </h4>
                       <p className="text-white/90 text-sm md:text-base font-semibold mb-6 max-w-[220px] md:max-w-sm leading-relaxed drop-shadow-md">{data.desc}</p>
+                      <Link to={`/rooms/${ROOM_PATHS[catName]}`} onClick={event => event.stopPropagation()} className="pointer-events-auto inline-flex items-center gap-6 rounded-full bg-white text-black px-6 py-3 text-sm font-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">Explore more <span aria-hidden="true">↗</span></Link>
                     </div>
                   </div>
                 </div>
@@ -1017,10 +986,11 @@ export default function Home() {
             );
           })}
         </div>
+      <div className="relative z-10 mt-10 text-center"><PreRegisterCTA /></div>
       </section>
 
       {/* 4. WHAT'S ACTUALLY ON THE LINE */}
-      <section className="relative w-full py-16 md:py-24 px-4 md:px-8 border-y border-[#2A2A2E] overflow-hidden">
+      <section data-cta-section="home-rewards" className="relative w-full py-16 md:py-24 px-4 md:px-8 border-y border-[#2A2A2E] overflow-hidden">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <img src={PLACEHOLDER_BG} alt="Rewards Background" className="w-full h-full object-cover opacity-20 mix-blend-luminosity" />
@@ -1054,20 +1024,21 @@ export default function Home() {
             ))}
           </div>
         </div>
+
       </section>
 
       {/* 5. THE CHALLENGE VAULT (REFINED HOVER ACTION) */}
-      <section id="opportunities" className="py-16 md:py-24 relative overflow-hidden bg-transparent border-b border-[#2A2A2E] scroll-mt-10">
+      <section data-cta-section="opportunities" id="opportunities" className="py-16 md:py-24 relative overflow-hidden bg-transparent border-b border-[#2A2A2E] scroll-mt-10">
         <div className="max-w-[1600px] mx-auto px-4 md:px-8">
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-8 md:mb-12">
               <div>
                 <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-2 md:mb-4 text-white">The Challenge Vault</h2>
-                <p className="text-[#A1A1AA] text-sm md:text-base font-bold">Pick a brief. Build your proof. Get noticed.</p>
+                <p className="text-[#A1A1AA] text-sm md:text-base font-bold">Big questions. Brands under wraps. See one you’d love to take on?</p>
               </div>
               <div className="flex items-center bg-[#1C1C1E]/80 backdrop-blur-md border border-[#2A2A2E] rounded-full px-4 py-2.5 md:px-5 md:py-3 w-full md:w-[350px]">
                 <Search className="w-4 h-4 md:w-5 md:h-5 text-[#71717A] mr-2 md:mr-3" />
-                <input type="text" placeholder="Search brands or briefs..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-transparent text-sm text-white focus:outline-none w-full placeholder:text-[#71717A]" />
+                <input type="text" placeholder="Search challenges or industries..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-transparent text-sm text-white focus:outline-none w-full placeholder:text-[#71717A]" />
               </div>
             </div>
 
@@ -1098,7 +1069,7 @@ export default function Home() {
                   <ScrollReveal key={opp.id} delay={(i % 4) * 50}>
                     <div 
                       className="relative rounded-[2.5rem] bg-[#161616] border border-[#2A2A2E] h-[540px] flex flex-col overflow-hidden group cursor-pointer shadow-sm"
-                      onClick={scrollToWaitlist}
+                      data-cta={`vault-${opp.id}`} onClick={goToPreRegister}
                     >
                       {/* Background Image */}
                       <img src={opp.bgImage || PLACEHOLDER_BG} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -1114,9 +1085,11 @@ export default function Home() {
                         {/* Bottom Gradient & Content */}
                         <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent pointer-events-none" />
                         <div className="relative z-10 w-full mt-auto">
-                           <h4 className="text-3xl font-black text-white mb-6 leading-tight">{opp.title}</h4>
+                           <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-3">{opp.company}</p>
+                           <h4 className="text-3xl font-black text-white mb-4 leading-tight">{opp.title}</h4>
+                           <p className="text-sm leading-relaxed text-white/80 mb-6">{opp.description}</p>
                            <button className="w-full bg-[#1C1C1E] border border-[#2A2A2E] text-white py-4 rounded-xl text-sm font-black flex justify-center items-center gap-2 shadow-lg backdrop-blur-md">
-                              Hover to view brief
+                              Count me in ↗
                            </button>
                         </div>
                       </div>
@@ -1131,43 +1104,27 @@ export default function Home() {
                         <div className="flex justify-between items-start mb-6">
                           <div className="flex flex-col gap-2">
                             <div className="flex flex-wrap gap-2">
-                              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/10 border border-white/5 text-white/90 shadow-sm">{opp.type}</span>
-                              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/10 border border-white/5 text-white/90 shadow-sm">PPO Pathway</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/10 border border-white/5 text-white/90 shadow-sm">First drop / Preview</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/10 border border-white/5 text-white/90 shadow-sm">Brand under wraps</span>
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-[#10B981] text-white w-fit shadow-sm">Opens on Dussehra (Oct 20)</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-[#10B981] text-white w-fit shadow-sm">Full brief coming soon</span>
                           </div>
                           <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-md border border-white/5 shadow-sm">↗</div>
                         </div>
 
                         {/* Title & Company */}
-                        <h3 className="text-3xl md:text-4xl font-black text-white leading-tight mb-6 drop-shadow-md">{opp.title}</h3>
+                        <h3 className="text-2xl md:text-3xl font-black text-white leading-tight mb-5 drop-shadow-md">{opp.title}</h3>
                         
-                        <div className="flex items-center gap-3 mb-6">
-                           <div className="w-12 h-12 rounded-full bg-white p-1.5 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                             {opp.logoUrl ? <img src={opp.logoUrl} alt={opp.company} className="w-full h-full object-contain" /> : <span className="text-[#111] font-black text-xl">{opp.company.charAt(0)}</span>}
-                           </div>
-                           <div className="flex items-center gap-1.5 text-white font-bold text-lg drop-shadow-md">
-                             {opp.company} <CheckCircle2 className="w-5 h-5 text-[#3BA8E7]" strokeWidth={3} /> <span className="text-[10px] uppercase tracking-widest text-white/60 font-black ml-1">Verified</span>
-                           </div>
-                        </div>
-
-                        {/* Tags */}
-                        <div className="flex gap-2 mb-6">
-                          <span className="text-[11px] font-bold px-4 py-2 rounded-full border border-white/20 text-white/90 bg-white/5 backdrop-blur-sm">Team 1-4</span>
-                          <span className="text-[11px] font-bold px-4 py-2 rounded-full border border-white/20 text-white/90 bg-white/5 backdrop-blur-sm">Beginner Friendly</span>
-                        </div>
-
-                        {/* Reward Box */}
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-5">{opp.company}</p>
                         <div className="bg-white/5 border border-white/20 rounded-2xl p-5 mb-auto backdrop-blur-sm">
-                          <h4 className="text-2xl font-black text-white drop-shadow-sm mb-1">{opp.points.split('+')[0].trim()}</h4>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#A1A1AA]">{opp.duration} • {opp.deadline}</p>
+                          <p className="text-white/90 text-sm font-medium leading-relaxed">{opp.description}</p>
                         </div>
 
                         {/* CTA & Desc */}
                         <button className="w-full bg-[#E92A39] text-white py-4 rounded-xl text-sm font-black flex justify-center items-center gap-2 shadow-lg mb-4 hover:bg-[#ff3b4b] transition-colors mt-6">
-                          ⏳ Pre-register to Apply
+                          I’m in ↗
                         </button>
-                        <p className="text-[#A1A1AA] text-xs font-medium line-clamp-2 leading-relaxed drop-shadow-sm">{opp.description}</p>
+                        <p className="text-[#A1A1AA] text-xs font-medium leading-relaxed">Got a different take? There’s room for it.</p>
                       </div>
                     </div>
                   </ScrollReveal>
@@ -1176,10 +1133,11 @@ export default function Home() {
             </div>
           )}
         </div>
+      <div className="relative z-10 mt-10 text-center"><PreRegisterCTA label="Count me in" /></div>
       </section>
 
       {/* 6. SINGLE MERGED PROCESS VIDEO PLAYER */}
-      <section id="inside" className="py-16 md:py-28 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E] relative overflow-hidden">
+      <section data-cta-section="inside" id="inside" className="py-16 md:py-28 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E] relative overflow-hidden">
         <ScrollReveal>
           <div className="max-w-3xl mb-12 md:mb-16">
             <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-4">
@@ -1224,12 +1182,13 @@ export default function Home() {
             </figure>
           </ScrollReveal>
         </div>
+      <div className="relative z-10 mt-10 text-center"><PreRegisterCTA /></div>
       </section>
 
       <RegistrationJourney />
 
       {/* 9. FAQ */}
-      <section className="py-16 md:py-24 px-4 md:px-8 bg-transparent border-t border-[#2A2A2E]">
+      <section data-cta-section="home-faq" className="py-16 md:py-24 px-4 md:px-8 bg-transparent border-t border-[#2A2A2E]">
         <div className="max-w-3xl mx-auto">
           <ScrollReveal>
             <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-8 md:mb-10 text-white text-left md:text-center">Before you ask.</h2>
@@ -1240,10 +1199,11 @@ export default function Home() {
             </div>
           </ScrollReveal>
         </div>
+
       </section>
 
       {/* 10. FINAL COUNTDOWN CTA */}
-      <section className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto relative z-10">
+      <section data-cta-section="home-footer" className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto relative z-10">
         <ScrollReveal>
           <div className="bg-[#1C1C1E]/80 backdrop-blur-md border border-[#2A2A2E] rounded-2xl md:rounded-[3rem] p-8 md:p-20 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-t from-[#E92A39]/10 to-transparent pointer-events-none"></div>
@@ -1253,7 +1213,7 @@ export default function Home() {
             <p className="text-[#A1A1AA] text-sm md:text-lg font-bold mb-8 md:mb-10 max-w-xl relative z-10">
               Don't miss the first cohort of live briefs. Pre-register to secure early access.
             </p>
-            <button onClick={scrollToWaitlist} className="bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-8 md:px-10 py-4 md:py-5 rounded-full font-black text-xs md:text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg relative z-10">
+            <button data-cta="home-footer" onClick={goToPreRegister} className="bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-8 md:px-10 py-4 md:py-5 rounded-full font-black text-xs md:text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg relative z-10">
               Pre-register
             </button>
           </div>

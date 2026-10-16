@@ -3,6 +3,9 @@ import type { Core } from '@strapi/strapi';
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
   const client = env('DATABASE_CLIENT', 'sqlite');
+  if (env.bool('RENDER', false) && (client !== 'postgres' || !env('DATABASE_URL'))) {
+    throw new Error('Render requires DATABASE_CLIENT=postgres and a Neon DATABASE_URL; local SQLite storage is not persistent.');
+  }
 
   const connections = {
     mysql: {
