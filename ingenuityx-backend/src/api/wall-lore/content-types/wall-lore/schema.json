@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "wall_lores",
+  "info": {
+    "singularName": "wall-lore",
+    "pluralName": "wall-lores",
+    "displayName": "Wall Lore"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    }
+  }
+}

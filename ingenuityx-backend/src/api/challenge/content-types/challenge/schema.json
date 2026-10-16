@@ -1,0 +1,126 @@
+{
+  "kind": "collectionType",
+  "collectionName": "challenges",
+  "info": {
+    "singularName": "challenge",
+    "pluralName": "challenges",
+    "displayName": "Challenge"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "string"
+    },
+    "points": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "tags": {
+      "type": "string"
+    },
+    "deadline": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "registrations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::registration.registration",
+      "mappedBy": "challenge"
+    },
+    "question1": {
+      "type": "text"
+    },
+    "question2": {
+      "type": "text"
+    },
+    "eligibility": {
+      "type": "blocks"
+    },
+    "companyBio": {
+      "type": "text"
+    },
+    "teamSize": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string"
+    },
+    "roundStructure": {
+      "type": "text"
+    },
+    "judgingCriteria": {
+      "type": "text"
+    },
+    "submissionFormat": {
+      "type": "text"
+    },
+    "registrationDeadline": {
+      "type": "string"
+    },
+    "shortlistDate": {
+      "type": "string"
+    },
+    "finaleDate": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "personality_type": {
+      "type": "string"
+    },
+    "linkedin": {
+      "type": "string"
+    },
+    "portfolio": {
+      "type": "string"
+    },
+    "university": {
+      "type": "string"
+    },
+    "stream": {
+      "type": "string"
+    },
+    "cgpa": {
+      "type": "string"
+    },
+    "grad_year": {
+      "type": "string"
+    },
+    "skills": {
+      "type": "string"
+    },
+    "motivation": {
+      "type": "text"
+    },
+    "brag": {
+      "type": "text"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cta_events",
+  "info": {
+    "singularName": "cta-event",
+    "pluralName": "cta-events",
+    "displayName": "CTA click"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
+  "attributes": {
+    "eventId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "source": {
+      "type": "string",
+      "required": true
+    },
+    "page": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

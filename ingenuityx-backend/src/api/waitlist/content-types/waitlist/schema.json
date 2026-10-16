@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "waitlists",
+  "info": {
+    "singularName": "waitlist",
+    "pluralName": "waitlists",
+    "displayName": "Waitlist"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email"
+    }
+  }
+}

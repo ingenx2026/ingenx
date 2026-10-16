@@ -1,0 +1,86 @@
+
+.student-dashboard { background:#f7f4ee; color:#20211e; padding:40px; min-height:100vh; font-family:inherit; }
+.student-dashboard * { box-sizing:border-box; }
+.student-dashboard button,.student-dashboard input,.student-dashboard select { font:inherit; }
+.student-dashboard button,.student-dashboard a { cursor:pointer; }
+.student-dashboard button:disabled { opacity:.45; cursor:not-allowed; }
+.student-dashboard :focus-visible { outline:3px solid #ed512e; outline-offset:3px; }
+.sd-header { display:flex; justify-content:space-between; align-items:center; gap:24px; margin-bottom:30px; }
+.sd-eyebrow { font-size:11px; letter-spacing:.16em; font-weight:800; color:#c63b1d; margin:0 0 15px; }
+.sd-header h1 { font-size:44px; font-weight:800; line-height:1.05; letter-spacing:-2px; margin:0 0 14px; }
+.sd-header h1 em { font-style:normal; color:#d84524; }
+.sd-header p:last-child { color:#726e64; font-size:14px; }
+.sd-refresh { padding:12px 18px; background:#20211e; border:0; border-radius:6px; color:#fff; font-size:13px!important; }
+.sd-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:30px; }
+.sd-stats>div { border:1px solid #ded9cf; padding:22px; border-radius:10px; background:#fffdf9; }
+.sd-stats strong { font-size:32px; display:block; font-weight:800; margin-bottom:8px; }
+.sd-stats span { color:#776f62; font-size:12px; }
+.sd-toolbar { display:flex; gap:16px; margin-bottom:20px; }
+.sd-toolbar label { font-size:11px; font-weight:700; color:#6f675c; }
+.sd-toolbar label:first-child { flex:1; }
+.sd-toolbar input,.sd-toolbar select { display:block; margin-top:8px; width:100%; background:white; border:1px solid #d7d0c5; border-radius:6px; padding:12px 14px; color:#24251f; font-size:13px; min-height:44px; }
+.sd-toolbar select { min-width:170px; }
+.sd-workspace { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; gap:20px; }
+.sd-workspace.has-selection { grid-template-columns:minmax(0,1fr) 320px; }
+.sd-list { background:#fffdf9; border:1px solid #ded9cf; border-radius:10px; min-width:0; overflow:hidden; }
+.sd-list-heading { display:flex; justify-content:space-between; gap:16px; padding:22px; border-bottom:1px solid #e9e3d9; }
+.sd-list-heading h2 { font-size:16px; font-weight:700; margin:0; }
+.sd-list-heading span { font-size:12px; color:#7c7367; }
+.sd-table-scroll { overflow-x:auto; }
+.student-dashboard table { width:100%; border-collapse:collapse; text-align:left; }
+.student-dashboard th { background:#f1ede5; font-size:10px; text-transform:uppercase; letter-spacing:.08em; padding:14px 18px; font-weight:700; color:#776f62; }
+.student-dashboard td { border-bottom:1px solid #e9e3d9; padding:20px 18px; vertical-align:middle; font-size:12px; }
+.student-dashboard td:first-child { min-width:200px; max-width:270px; overflow-wrap:anywhere; }
+.student-dashboard td strong { display:block; font-size:14px; font-weight:700; margin-bottom:7px; }
+.student-dashboard td>span,.student-dashboard td>small { display:block; color:#776f62; font-size:11px; line-height:1.7; }
+.student-dashboard tr.is-selected { background:#fff0e8; }
+.sd-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.sd-tag { font-size:10px; padding:5px 8px; color:#615649; background:#f0e9dd; border-radius:4px; white-space:normal; }
+.sd-cv-actions { display:flex; flex-wrap:wrap; gap:7px; }
+.sd-cv-actions button { background:white; border:1px solid #d9c9b5; border-radius:5px; padding:8px 10px; font-size:11px; white-space:nowrap; }
+.sd-cv-actions button:first-child { border-color:#d84524; color:#bf3517; }
+.sd-profile-button { font-size:11px!important; font-weight:700!important; border:0; background:none; color:#bd371b; white-space:nowrap; padding:8px 0; }
+.sd-muted { color:#908373; font-size:11px; }
+.sd-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px 22px; font-size:11px; color:#7a7061; }
+.sd-pagination>div { display:flex; gap:10px; }
+.sd-pagination button { background:white; border:1px solid #dfd5c5; border-radius:4px; padding:8px 12px; color:#332d25; }
+.sd-profile { background:#fffdf9; border:1px solid #ded9cf; border-radius:10px; padding:26px; position:relative; overflow-wrap:anywhere; }
+.sd-close { position:absolute; right:15px; top:13px; background:transparent; border:0; font-size:26px!important; }
+.sd-avatar { width:55px; height:55px; background:#20211e; color:#fff4e8; font-size:26px; font-weight:700; display:flex; align-items:center; justify-content:center; border-radius:50%; margin:22px 0 16px; }
+.sd-profile h2 { font-size:23px; font-weight:800; margin:0 0 8px; }
+.sd-profile>a { color:#b4371d; font-size:12px; }
+.sd-college { font-size:12px; line-height:1.6; color:#786f61; margin:10px 0 24px; }
+.sd-profile-section { border-top:1px solid #e9e3d9; padding-top:18px; margin-top:18px; }
+.sd-profile-section h3 { font-size:11px; font-weight:800; margin:0 0 10px; }
+.sd-profile-section p { font-size:12px; line-height:1.7; color:#6e6355; white-space:pre-wrap; }
+.sd-profile-foot { color:#978875; font-size:10px; line-height:1.8; margin-top:25px; }
+.sd-error { padding:16px; background:#fff0ea; color:#9a2814; border:1px solid #e7b09c; border-radius:6px; margin-bottom:18px; font-size:13px; }
+.sd-empty { padding:55px 25px; text-align:center; }
+.sd-empty h3 { font-size:18px; font-weight:700; margin-bottom:12px; }
+.sd-empty p { color:#8a7a66; font-size:12px; line-height:1.7; }
+.sd-footer { color:#958674; font-size:10px; margin-top:24px; }
+.sd-preview { width:min(1100px,95vw); height:90vh; border:0; border-radius:10px; padding:0; background:#fffdf9; color:#20211e; margin:auto; box-shadow:0 20px 100px #0006; }
+.sd-preview::backdrop { background:#12120fe0; }
+.sd-preview[open] { display:flex; flex-direction:column; }
+.sd-preview header { display:flex; justify-content:space-between; align-items:center; gap:18px; padding:18px 24px; }
+.sd-preview header>div:last-child { display:flex; align-items:center; gap:24px; }
+.sd-preview strong { font-size:16px; font-weight:700; }
+.sd-preview header p { font-size:11px; margin-top:6px; color:#817260; }
+.sd-preview a { font-size:12px; color:#bd371b; text-decoration:underline; }
+.sd-preview button { border:0; background:none; font-size:28px; }
+.sd-preview iframe { width:100%; flex:1; min-height:0; border:0; background:#eee; }
+.sd-preview>p { font-size:10px; padding:10px 24px; color:#817260; }
+@media(max-width:1250px) { .sd-workspace.has-selection { grid-template-columns:minmax(0,1fr); } .sd-profile { grid-row:1; } }
+@media(max-width:700px) { .student-dashboard { padding:22px 16px; } .sd-header h1 { font-size:32px; } .sd-header { align-items:flex-start; } .sd-refresh { font-size:10px!important; padding:10px; white-space:nowrap; } .sd-stats { gap:8px; } .sd-stats>div { padding:14px 10px; } .sd-stats strong { font-size:25px; } .sd-stats span { font-size:10px; } .sd-toolbar { flex-direction:column; } .sd-preview header { padding:15px; } .sd-preview header>div:last-child { gap:12px; } }
+
+.sd-delete-button { display:block; background:none; border:0; padding:9px 0; color:#b3261e; font-size:11px!important; font-weight:700!important; text-align:left; }
+.sd-delete-button:hover { text-decoration:underline; }
+.sd-notice { padding:16px; margin-bottom:18px; border:1px solid #b4c8ac; background:#edf5e9; color:#284920; border-radius:6px; font-size:13px; }
+.sd-delete-dialog { margin:auto; padding:30px; width:min(500px,calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto; border:0; border-radius:12px; background:#fffdf9; color:#20211e; box-shadow:0 20px 100px #0006; }
+.sd-delete-dialog::backdrop { background:#12120fd9; }
+.sd-delete-dialog h2 { font-size:24px; font-weight:800; margin:0 0 12px; line-height:1.2; overflow-wrap:anywhere; }
+.sd-delete-dialog p { font-size:13px; line-height:1.7; margin-bottom:20px; }
+.sd-delete-email { color:#776f62; overflow-wrap:anywhere; }
+.sd-delete-dialog-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px; }
+.sd-delete-dialog-actions button { border:1px solid #d7d0c5; border-radius:5px; padding:12px 15px; background:white; color:#20211e; font-size:12px; font-weight:700; }
+.sd-delete-dialog-actions .sd-delete-confirm { color:white; background:#b3261e; border-color:#b3261e; }

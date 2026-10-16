@@ -1,0 +1,73 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pre_registrations",
+  "info": {
+    "singularName": "pre-registration",
+    "pluralName": "pre-registrations",
+    "displayName": "Pre-registration",
+    "description": "Student profiles from the one-minute form. CVs stay private in the database."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "college": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "interests": {
+      "type": "json",
+      "required": true
+    },
+    "opportunities": {
+      "type": "json",
+      "required": true
+    },
+    "skills": {
+      "type": "json",
+      "required": true
+    },
+    "about": {
+      "type": "text",
+      "required": true,
+      "maxLength": 400
+    },
+    "consentAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "reference": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    },
+    "requestId": {
+      "type": "string",
+      "unique": true,
+      "required": true,
+      "private": true
+    },
+    "cvName": {
+      "type": "string"
+    },
+    "cvBase64": {
+      "type": "text",
+      "private": true,
+      "configurable": false
+    },
+    "cohort": {
+      "type": "string",
+      "default": "Cohort 01 / Oct 2026"
+    }
+  }
+}
