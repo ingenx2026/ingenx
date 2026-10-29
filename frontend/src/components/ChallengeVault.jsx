@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Pause, Play } from 'lucide-react';
 import { VAULT_TEASERS } from '../data/vaultPreviews';
 import './ChallengeVault.css';
 
 export default function ChallengeVault({ categoryColors }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
   const [failedImages, setFailedImages] = useState({});
   const rail = useRef(null);
   const stage = useRef(null);
@@ -63,11 +64,12 @@ export default function ChallengeVault({ categoryColors }) {
     advance.current = () => select(activeIndex + 1);
   }, [activeIndex, select]);
   useEffect(() => {
+    if (paused) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) advance.current?.();
-    }, 2500);
+    }, 3500);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [paused]);
   const failImage = id => setFailedImages(previous => ({ ...previous, [id]: true }));
   return <section id="opportunities" data-cta-section="opportunities" className="challenge-vault" aria-labelledby="vault-heading">
     <div className="vault-container">
@@ -112,6 +114,7 @@ export default function ChallengeVault({ categoryColors }) {
             <div className="vault-controls">
               <button type="button" onClick={() => select(activeIndex - 1)} aria-label="Previous challenge"><ArrowLeft size={22} aria-hidden="true" /></button>
               <button type="button" onClick={() => select(activeIndex + 1)} aria-label="Next challenge"><ArrowRight size={22} aria-hidden="true" /></button>
+              <button type="button" onClick={() => setPaused(value => !value)} aria-label={paused ? 'Play challenge slideshow' : 'Pause challenge slideshow'} title={paused ? 'Play' : 'Pause'}>{paused ? <Play size={20} aria-hidden="true" /> : <Pause size={20} aria-hidden="true" />}</button>
               <div className="vault-progress" aria-hidden="true"><span style={{ width: `${((activeIndex + 1) / VAULT_TEASERS.length) * 100}%` }} /></div>
               <span className="vault-position" aria-hidden="true">{String(activeIndex + 1).padStart(2, '0')}<small> / 06</small></span>
             </div>
