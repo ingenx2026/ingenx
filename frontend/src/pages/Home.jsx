@@ -65,10 +65,10 @@ const CATEGORY_DATA = {
 // frontend/archive/challenge-vault/Home.before-anonymous-vault.jsx.txt.
 // --- REWARDS DATA ---
 const PLATFORM_REWARDS = [
-  { top: "Think", title: "Fresh Ideas", sub: "Explore a preview" },
-  { top: "Build", title: "A Response", sub: "When briefs open" },
-  { top: "Show", title: "Your Process", sub: "Explain your thinking" },
-  { top: "Grow", title: "Your Skills", sub: "Practice by doing" }
+  { top: "Think", title: "Fresh Ideas" },
+  { top: "Build", title: "A Response" },
+  { top: "Show", title: "Your Process" },
+  { top: "Grow", title: "Your Skills" }
 ];
 
 const REWARD_IMAGES = [
@@ -812,7 +812,6 @@ export default function Home() {
                   <div className="relative z-10 p-6 md:p-8 w-full flex flex-col items-center justify-center h-full">
                     <h3 className="text-4xl md:text-5xl font-black text-white mb-1 drop-shadow-md">{reward.top}</h3>
                     <h4 className="text-sm md:text-base font-bold text-[#FAFAFA] mb-2 uppercase tracking-widest drop-shadow-sm">{reward.title}</h4>
-                    <span className="text-[10px] md:text-xs font-black text-[#E92A39] uppercase tracking-widest bg-[#E92A39]/10 border border-[#E92A39]/20 px-3 py-1 rounded-full mt-2 backdrop-blur-md">{reward.sub}</span>
                   </div>
 
                 </div>
