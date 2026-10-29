@@ -1,3 +1,4 @@
+import { API_BASE } from '../apiConfig';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -5,7 +6,7 @@ import { CheckCircle2 } from 'lucide-react';
 
 import logoImage from '../imports/ingenuityx-logo.svg';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
+const API_URL = API_BASE;
 
 // --- SCROLL REVEAL COMPONENT ---
 function ScrollReveal({ children, direction = "up", delay = 0, width = "100%", className = "" }) {

@@ -682,6 +682,58 @@ export interface ApiRegistrationRegistration
   };
 }
 
+export interface ApiVolunteerVolunteer extends Struct.CollectionTypeSchema {
+  collectionName: 'volunteers';
+  info: {
+    displayName: 'Volunteer registrations';
+    pluralName: 'volunteers';
+    singularName: 'volunteer';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    acknowledgements: Schema.Attribute.JSON &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    consentAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    consentVersion: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::volunteer.volunteer'
+    > &
+      Schema.Attribute.Private;
+    location: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    reference: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    requestId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiWaitlistWaitlist extends Struct.CollectionTypeSchema {
   collectionName: 'waitlists';
   info: {
@@ -732,6 +784,98 @@ export interface ApiWallLoreWallLore extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     text: Schema.Attribute.Text;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiWhatIfAnswerWhatIfAnswer
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'what_if_answers';
+  info: {
+    displayName: 'What if \u2014 Answers';
+    pluralName: 'what-if-answers';
+    singularName: 'what-if-answer';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    answer: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 2000;
+      }>;
+    approved: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    consentAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    displayName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    email: Schema.Attribute.Email & Schema.Attribute.Private;
+    featured: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::what-if-answer.what-if-answer'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    questionDay: Schema.Attribute.Date & Schema.Attribute.Required;
+    questionNumber: Schema.Attribute.Integer & Schema.Attribute.Required;
+    questionText: Schema.Attribute.Text & Schema.Attribute.Required;
+    requestId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiWhatIfQuestionWhatIfQuestion
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'what_if_questions';
+  info: {
+    displayName: 'What if \u2014 Questions';
+    pluralName: 'what-if-questions';
+    singularName: 'what-if-question';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dayNumber: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 30;
+          min: 1;
+        },
+        number
+      >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::what-if-question.what-if-question'
+    > &
+      Schema.Attribute.Private;
+    prompt: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 700;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1268,8 +1412,11 @@ declare module '@strapi/strapi' {
       'api::cta-event.cta-event': ApiCtaEventCtaEvent;
       'api::pre-registration.pre-registration': ApiPreRegistrationPreRegistration;
       'api::registration.registration': ApiRegistrationRegistration;
+      'api::volunteer.volunteer': ApiVolunteerVolunteer;
       'api::waitlist.waitlist': ApiWaitlistWaitlist;
       'api::wall-lore.wall-lore': ApiWallLoreWallLore;
+      'api::what-if-answer.what-if-answer': ApiWhatIfAnswerWhatIfAnswer;
+      'api::what-if-question.what-if-question': ApiWhatIfQuestionWhatIfQuestion;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

@@ -1,9 +1,11 @@
-import { ROOM_PATHS } from '../data/rooms';
+import RegistrationJourney from '../components/RegistrationJourney';
+import ChallengeVault from '../components/ChallengeVault';
+import WhatIf from '../components/WhatIf';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ImageWithFallback } from '../components/ImageWithFallback';
-import { Search, Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal } from 'lucide-react';
+import { Lock, CheckCircle2, ChevronRight, Clock, Award, Upload, Scale, FileText, TrendingUp, MessageCircle, Terminal } from 'lucide-react';
 
 // --- MEDIA IMPORTS ---
 import billboardImage from '../imports/Gemini_Generated_Image_1l2vfz1l2vfz1l2v.png';
@@ -18,20 +20,10 @@ import journeyMentorship from '../imports/step new.jpg';
 import journeyFinale from '../imports/step 4.jpg';
 
 // --- LOCAL LOGOS ---
-import nuvocoLogo from '../imports/logo_nuvoco.jpg';
-import srmbLogo from '../imports/srmb.jpg';
-import ingenxLogo from '../imports/ingenx.png';
-import trootechLogo from '../imports/trootech.png';
 
 // --- POSTER IMAGES ---
-import legrandBg from '../imports/legrand.png';
-import nuvocoGreenBg from '../imports/nuvoco (1).png';
-import srmbShiftBg from '../imports/nuvoco.png';
 import srmbGreenProBg from '../imports/srmb (1).png';
-import srmbIroncladBg from '../imports/srmb.png';
-import trootechPosterBg from '../imports/Trootech (2).png';
 import ingenxPosterBg from '../imports/IngenX (2).png';
-import evereadyBg from '../imports/eveready.png';
 
 // --- CREATOR CHALLENGE IMAGES ---
 import creatorImg1 from "../imports/creator's challenge.png";
@@ -39,7 +31,6 @@ import creatorImg1 from "../imports/creator's challenge.png";
 // --- HERO VIDEOS ---
 import intervie from '../imports/intervie.mp4';
 import collaborating from '../imports/collaborating.mp4';
-import prep from '../imports/prep.mp4';
 import chaos from '../imports/chaos.mp4';
 import celebration3 from '../imports/celebration3.mp4';
 
@@ -49,7 +40,6 @@ import img7 from '../imports/img7.png';
 // =====================================================================
 // ENVIRONMENT & CONSTANTS
 // =====================================================================
-const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
 const PLACEHOLDER_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop";
 const GLOBAL_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop";
 
@@ -73,21 +63,12 @@ const CATEGORY_DATA = {
 
 // Anonymous preview copy. Original branded page is preserved in
 // frontend/archive/challenge-vault/Home.before-anonymous-vault.jsx.txt.
-const VAULT_TEASERS = [
-  { id: 'preview-ice-cream', category: 'Marketing', company: 'FOOD / THE ALL-YEAR CHALLENGE', title: "Who said ice cream gets a summer job?", description: 'Rainy Tuesdays. December nights. An ice cream brand wants in on all 12 months. Give people a reason to reach for a scoop beyond summer.' },
-  { id: 'preview-sunscreen', category: 'Design', company: 'BEAUTY / THE DAILY HABIT', title: 'SPF needs a personality transplant.', description: 'A beauty brand wants SPF out of the beach bag and into the daily routine. Make it the thing people reach for, not the thing they forget.' },
-  { id: 'preview-ev', category: 'Innovation', company: 'AUTO / BEYOND THE BATTERY', title: 'Dear EV brands, enough with the battery talk.', description: 'Range. Charging. Kilometres. We’ve heard it. An EV brand wants a story that makes India fall for the car. What would yours be?' },
-  { id: 'preview-cement', category: 'Sustainability', company: 'MATERIALS / A LIGHTER FOOTPRINT', title: 'The next skyline needs a smaller footprint.', description: 'A building materials brand wants to cut carbon without cutting corners. Find the change that could make the way we build worth rebuilding.' },
-  { id: 'preview-ai', category: 'Tech', company: 'TECH / THE POWER PROBLEM', title: 'AI has an energy bill. Someone has to fix it.', description: 'More AI. More demand. An energy solutions brand wants less waste in the system. Build an answer that works beyond the pitch deck.' },
-  { id: 'preview-steel', category: 'Marketing', company: 'BUILDING / THE INVISIBLE CHOICE', title: 'Dream homes have moodboards. Steel never makes them.', description: 'A construction brand wants first-time homeowners to care about what holds it all together. Make the invisible part of a home impossible to ignore.' },
-].map(teaser => ({ ...teaser, bgImage: CATEGORY_DATA[teaser.category].img }));
-
 // --- REWARDS DATA ---
 const PLATFORM_REWARDS = [
-  { top: "120+", title: "Internships", sub: "+ Rs 50k Stipends" },
-  { top: "100%", title: "Verified", sub: "+ Real Certificates" },
-  { top: "₹5L+", title: "Prize Pool", sub: "+ Tech Setups" },
-  { top: "50+", title: "PPIs", sub: "+ Boardroom Access" }
+  { top: "Think", title: "Fresh Ideas", sub: "Explore a preview" },
+  { top: "Build", title: "A Response", sub: "When briefs open" },
+  { top: "Show", title: "Your Process", sub: "Explain your thinking" },
+  { top: "Grow", title: "Your Skills", sub: "Practice by doing" }
 ];
 
 const REWARD_IMAGES = [
@@ -98,12 +79,6 @@ const REWARD_IMAGES = [
 ];
 
 // --- PROCESS SECTION DATA ---
-const PROCESS_CLIPS = [
-  { src: collaborating, label: '01 / BRIEF PADHO' },
-  { src: intervie, label: '02 / INSIGHT DHUNDO' },
-  { src: chaos, label: '03 / FIRST IDEA TODO' },
-  { src: prep, label: '04 / CASE BANAO' },
-];
 
 // --- HERO HEADLINE HOOKS ---
 const HERO_RED_HOOKS = [
@@ -480,14 +455,13 @@ function RegistrationLaunchBanner() {
             </figure>
             <div className="launch-stats" aria-label="Cohort at a glance">
               {[
-                { value: 100, suffix: '+', label: 'Opportunities', note: 'Think beyond the classroom.' },
-                { value: CATEGORY_FILTERS.length - 1, suffix: '', label: 'Themes', note: 'Find your kind of challenge.' },
-                { value: 1, suffix: '', label: 'First cohort', note: 'Make your first move count.' },
+                { value: 100, suffix: '+', label: 'Opportunities' },
+                { value: CATEGORY_FILTERS.length - 1, suffix: '', label: 'Themes' },
+                { value: 1, suffix: '', label: 'First cohort' },
               ].map((stat, index) => (
                 <div key={stat.label} className="launch-stat" style={{ '--stat-delay': `${index * 140}ms` }} aria-label={`${stat.value}${stat.suffix} ${stat.label}`}>
                   <strong aria-hidden="true">{String(Math.round(stat.value * statProgress)).padStart(index === 2 ? 2 : 1, '0')}{stat.suffix}</strong>
                   <span className="launch-stat-label">{stat.label}</span>
-                  <p>{stat.note}</p>
                 </div>
               ))}
             </div>
@@ -511,12 +485,11 @@ function RegistrationLaunchBanner() {
           </button>
         </div>
         <div className="launch-info">
-          <p className="launch-edition">INGENUITYX / COHORT 01 OCT 2026</p>
+          <p className="launch-edition">COHORT 01 NOV 2026</p>
           <h2 id="registration-launch-title" className="launch-heading">Don’t just<br />watch.<br /><em>Be in the room.</em></h2>
           <p className="launch-one-liner">Be the team they talk about.</p>
           <p className="launch-subline launch-mantra">Dare <span aria-hidden="true">››</span> Discover <span aria-hidden="true">››</span> Do.</p>
-          <Link to="/register" className="launch-button">Pre-register <span aria-hidden="true">↗</span></Link>
-          <p className="launch-footnote">The first chapter only happens once.</p>
+          <Link to="/register" className="launch-button">Pre-register</Link>
         </div>
       </div>
     </section>
@@ -532,121 +505,9 @@ const REGISTRATION_STEPS = [
   { number: '05', label: 'THE FINALE', title: 'Own the stage.', description: 'If shortlisted, take your idea into the finale. Present your thinking, answer the tough questions, and show what makes your solution stand out.', image: journeyFinale, alt: 'Finalists presenting their idea to a panel and audience' },
 ];
 
-function RegistrationJourney() {
-  const sectionRef = useRef(null);
-  const trackRef = useRef(null);
-  const progressRef = useRef(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-    const progressElement = progressRef.current;
-    if (!section || !track || !progressElement) return;
-    let active = true;
-    const rows = [...section.querySelectorAll('.journey-step')];
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = null;
-    section.classList.add('journey-ready');
-
-    const updateProgress = () => {
-      frame = null;
-      if (!active || !track.isConnected || !progressElement.isConnected) return;
-      const bounds = track.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.7 - bounds.top) / Math.max(1, bounds.height)));
-      progressElement.style.transform = `scaleY(${media.matches ? 1 : progress})`;
-    };
-    const onScroll = () => {
-      if (active && frame === null) frame = window.requestAnimationFrame(updateProgress);
-    };
-    const observer = new IntersectionObserver(entries => {
-      if (!active) return;
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('journey-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    rows.forEach(row => observer.observe(row));
-    updateProgress();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    media.addEventListener('change', onScroll);
-    return () => {
-      active = false;
-      observer.disconnect();
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      media.removeEventListener('change', onScroll);
-      if (frame !== null) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return (
-    <section data-cta-section="registration-journey" ref={sectionRef} id="registration-journey" aria-labelledby="registration-journey-title" className="py-16 md:py-24 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E]">
-      <style>{`
-        #registration-journey .journey-timeline { position: relative; margin: 0; padding: 0; list-style: none; }
-        #registration-journey .journey-track { position: absolute; width: 2px; left: 30%; top: 0; bottom: 0; transform: translateX(-50%); background: #2A2A2E; overflow: hidden; }
-        #registration-journey .journey-progress { width: 100%; height: 100%; background: #E92A39; transform: scaleY(0); transform-origin: top; }
-        #registration-journey .journey-step { position: relative; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); align-items: center; padding: 40px 0; perspective: 1400px; }
-        #registration-journey .journey-image { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; padding-left: clamp(32px, 3vw, 48px); transform-origin: left center; }
-        #registration-journey .journey-copy { grid-column: 1; grid-row: 1; min-width: 0; padding: 24px clamp(32px, 3vw, 48px) 24px 0; transform-origin: right center; overflow-wrap: break-word; }
-        #registration-journey .journey-copy h3 { font-size: clamp(22px, 2.5vw, 36px); }
-        #registration-journey .journey-node { position: absolute; left: 30%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: #151515; border: 1px solid #52525B; color: #A1A1AA; font-size: 12px; font-weight: 900; z-index: 1; transition: background .6s, border-color .6s, color .6s, box-shadow .6s; }
-        #registration-journey .journey-image, #registration-journey .journey-copy { opacity: 1; transform: translateX(0) rotateY(0) scale(1); clip-path: inset(0 0 0 0); transition: opacity .85s ease, transform 1.1s cubic-bezier(.16,1,.3,1), clip-path 1.1s cubic-bezier(.16,1,.3,1); }
-        #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-image { opacity: 0; transform: translateX(-36px) rotateY(12deg) scale(.96); clip-path: inset(0 16% 0 0); }
-        #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-copy { opacity: 0; transform: translateX(28px) rotateY(-12deg) scale(.96); clip-path: inset(0 0 0 16%); }
-        #registration-journey .journey-visible .journey-node { background: #E92A39; border-color: #E92A39; color: white; box-shadow: 0 0 0 7px rgba(233,42,57,.1), 0 0 24px rgba(233,42,57,.22); }
-        @media (max-width: 767px) {
-          #registration-journey .journey-track { left: 20px; }
-          #registration-journey .journey-step { grid-template-columns: 40px minmax(0, 1fr); column-gap: 16px; padding: 24px 0; align-items: start; perspective: none; }
-          #registration-journey .journey-node { position: static; transform: none; grid-column: 1; grid-row: 1; justify-self: center; width: 36px; height: 36px; margin-top: 16px; }
-          #registration-journey .journey-image { grid-column: 2; grid-row: 1; padding-left: 0; }
-          #registration-journey .journey-copy { grid-column: 2; grid-row: 2; padding: 24px 0 8px; }
-          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-image,
-          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-copy { transform: translateY(24px) scale(.98); clip-path: inset(0 0 8% 0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          #registration-journey .journey-image, #registration-journey .journey-copy, #registration-journey .journey-node { transition: none; }
-          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-image,
-          #registration-journey.journey-ready .journey-step:not(.journey-visible) .journey-copy { opacity: 1; transform: none; clip-path: none; }
-        }
-      `}</style>
-      <div className="max-w-3xl mb-10 md:mb-16">
-        <p className="text-[#E92A39] text-xs font-black uppercase tracking-[.2em] mb-4">Your journey starts with pre-registration</p>
-        <h2 id="registration-journey-title" className="text-4xl md:text-6xl font-black tracking-tight text-white mb-5">Dare <span className="text-[#E92A39]">&gt;&gt;&gt;&gt;</span> Discover <span className="text-[#E92A39]">&gt;&gt; DO</span></h2>
-        <p className="text-[#A1A1AA] text-base md:text-xl font-semibold max-w-xl">Head to the pre-registration page to create your InGenuityX profile. Start there, then follow the journey from your first brief to the finale.</p>
-        <Link to="/register" className="inline-flex items-center gap-2 mt-6 bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-7 py-4 rounded-full text-sm font-black transition-colors">Pre-register <ChevronRight className="w-4 h-4" /></Link>
-      </div>
-      <div className="relative">
-        <div ref={trackRef} className="journey-track" aria-hidden="true"><div ref={progressRef} className="journey-progress" /></div>
-        <ol className="journey-timeline">
-          {REGISTRATION_STEPS.map(step => (
-            <li key={step.number} className="journey-step">
-              <figure className="journey-image">
-                <img src={step.image} alt={step.alt} loading="lazy" width="1200" height="750" className="w-full aspect-[8/5] object-contain bg-[#161616] rounded-2xl md:rounded-[2rem] border border-[#2A2A2E] shadow-2xl" />
-              </figure>
-              <span className="journey-node" aria-hidden="true">{step.number}</span>
-              <div className="journey-copy">
-                <p className="text-[#E92A39] text-[10px] md:text-xs font-black uppercase tracking-[.18em] mb-3">Step {step.number} / {step.label}</p>
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white mb-4">{step.title}</h3>
-                <p className="text-[#A1A1AA] text-sm md:text-base lg:text-lg font-semibold leading-relaxed">{step.description}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-10 md:mt-16 rounded-2xl border border-[#2A2A2E] bg-[#161616]/80 p-6 md:p-8">
-        <p className="text-xl md:text-2xl font-black text-white">Ready to get started? Create your profile.</p>
-        <Link to="/register" className="inline-flex items-center gap-2 bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-7 py-4 rounded-full text-sm font-black transition-colors">Pre-register <ChevronRight className="w-4 h-4" /></Link>
-      </div>
-    </section>
-  );
-}
-
 // --- PAGE OPENING TRANSITION ---
 function PreRegisterCTA({ label = 'Pre-register' }) {
-  return <Link to="/register" className="inline-flex items-center justify-center gap-5 bg-[#ff4b26] text-white px-7 py-4 rounded-full text-sm font-black hover:bg-[#df3512] hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4b26]">{label} <span aria-hidden="true">↗</span></Link>;
+  return <Link to="/register" className="inline-flex items-center justify-center gap-5 bg-[#ff4b26] text-white px-7 py-4 rounded-full text-sm font-black hover:bg-[#df3512] hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4b26]">{label}</Link>;
 }
 
 function PageOpeningTransition() {
@@ -685,15 +546,11 @@ function PageOpeningTransition() {
 export default function Home() {
   const navigate = useNavigate();
 
-  const [opportunities, setOpportunities] = useState([]);
-  const [isLoadingOpps, setIsLoadingOpps] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
   const [openFaq, setOpenFaq] = useState(-1);
   const [heroVideoIndex, setHeroVideoIndex] = useState(0);
-  const [processVideoIndex, setProcessVideoIndex] = useState(0); 
+
 
 
   const heroVideos = [
@@ -739,17 +596,9 @@ export default function Home() {
     };
   }, [heroVideos.length]);
 
-  useEffect(() => {
-    if (PROCESS_CLIPS.length <= 1) return;
-    const processIntervalId = setInterval(() => {
-      setProcessVideoIndex((prevIndex) => (prevIndex + 1) % PROCESS_CLIPS.length);
-    }, 5000); 
-
-    return () => clearInterval(processIntervalId);
-  }, []);
 
   useEffect(() => {
-    const targetDate = new Date('2026-10-20T00:00:00Z').getTime();
+    const targetDate = new Date('2026-11-08T00:00:00+05:30').getTime();
     const tick = () => {
       const distance = targetDate - Date.now();
       if (distance < 0) { setCountdown({ days: 0, hours: 0, minutes: 0 }); return; }
@@ -764,61 +613,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const fetchPlatformData = async () => {
-      try {
-        const oppsResponse = await axios.get(`${API_URL}/api/challenges`).catch(() => ({ data: { data: [] } }));
-        const fetchedOpps = oppsResponse.data.data.map(item => {
-          const attr = item.attributes || item;
-          let plainTextDescription = attr.description;
-          if (Array.isArray(attr.description)) {
-            plainTextDescription = attr.description.map(block => block.children ? block.children.map(child => child.text).join('') : '').join('\n');
-          }
-          let finalLogoUrl = attr.logoUrl;
-          if (!finalLogoUrl) {
-            const compNameLower = (attr.company || '').toLowerCase();
-            if (compNameLower.includes('nuvoco')) finalLogoUrl = nuvocoLogo;
-            else if (compNameLower.includes('srmb')) finalLogoUrl = srmbLogo;
-            else if (compNameLower.includes('ingenx') || compNameLower.includes('ingenuityx')) finalLogoUrl = ingenxLogo;
-            else if (compNameLower.includes('trootech')) finalLogoUrl = trootechLogo;
-          }
-          return {
-            id: item.documentId || item.id,
-            title: attr.title,
-            company: attr.company,
-            logoUrl: finalLogoUrl,
-            type: attr.type || 'Competition',
-            category: attr.category || 'Marketing',
-            duration: attr.duration,
-            points: attr.points,
-            description: plainTextDescription,
-            deadline: attr.deadline,
-          };
-        });
-
-        const DEMO_CHALLENGES = [
-          { id: "demo-eveready-1", title: "Keep It Lit", company: "Eveready", logoUrl: null, bgImage: evereadyBg, type: "Innovation Project", category: "Innovation", duration: "4 Weeks", points: "Internship + Rs 50k", description: "Reinvent portable lighting for rural and everyday India. Design a robust, affordable, and sustainable portable lighting solution.", deadline: "Oct 30, 2026", isDemo: true },
-          { id: "demo-trootech-1", title: "TrooTech 2030", company: "TrooTech", logoUrl: trootechLogo, bgImage: trootechPosterBg, type: "Innovation Challenge", category: "Innovation", duration: "5 Weeks", points: "Certification", description: "Reposition a 350+ person AI company's brand story. Innovate, collaborate, and change the game in this challenge.", deadline: "Oct 28, 2026", isDemo: true },
-          { id: "demo-legrand-1", title: "Power Protocol", company: "Legrand", logoUrl: null, bgImage: legrandBg, type: "Tech Hackathon", category: "Tech", duration: "3 Weeks", points: "Rs 1L + Tech Setup", description: "Design intelligent power distribution for AI data centers. Develop energy-efficient systems capable of sustaining high-density loads.", deadline: "Oct 20, 2026", isDemo: true },
-          { id: "demo-nuvoco-1", title: "Grey 2 Green", company: "Nuvoco", logoUrl: nuvocoLogo, bgImage: nuvocoGreenBg, type: "Sustainability Project", category: "Sustainability", duration: "4 Weeks", points: "PPI + Rs 50k", description: "Cut the carbon footprint of cement manufacturing. Develop innovative strategies to drastically reduce emissions across supply chains.", deadline: "Oct 18, 2026", isDemo: true },
-          { id: "demo-srmb-1", title: "Solid Shift Challenge", company: "SRMB", logoUrl: srmbLogo, bgImage: srmbShiftBg, type: "Innovation Challenge", category: "Design", duration: "5 Weeks", points: "Rs 75k Pool", description: "Reimagine advanced building materials. Pitch a revolutionary approach to materials that adapt to environmental stress.", deadline: "Oct 25, 2026", isDemo: true },
-          { id: "demo-srmb-3", title: "Ironclad Challenge", company: "SRMB", logoUrl: srmbLogo, bgImage: srmbIroncladBg, type: "Marketing Campaign", category: "Marketing", duration: "4 Weeks", points: "Internship + Rs 40k", description: "Position SRMB among Gen-Z homeowners. Design a robust go-to-market strategy to solidify their leadership.", deadline: "Oct 22, 2026", isDemo: true }
-        ];
-
-        setOpportunities([...DEMO_CHALLENGES, ...fetchedOpps]);
-      } catch (error) {
-        console.error("Error fetching platform data:", error);
-      } finally {
-        setIsLoadingOpps(false);
-      }
-    };
-    void fetchPlatformData; // Retained for the later brand reveal.
-    // Keep the branded data loader above for the later brand reveal.
-    // Preview mode deliberately does not fetch or render named challenges.
-    setOpportunities(VAULT_TEASERS);
-    setIsLoadingOpps(false);
-  }, []);
-
   const faqs = [
     { q: "Is this actually legit, or filler content?", a: "Bilkul legit. Every brief comes straight from a real brand with a real problem — win, and they might actually build your idea, not just hand you a PDF certificate." },
     { q: "Do I need a top college tag to win?", a: "Nahi. We hide your college name till the shortlist stage — brands only see the idea. Merit se hoga, tag se nahi." },
@@ -827,14 +621,8 @@ export default function Home() {
     { q: "Submit kiya, jeeta nahi — waste gaya?", a: "Bilkul nahi. You still get 'The Rejection Letter' — a real scorecard on your Insight, Strategy aur Execution. Actual feedback, participation trophy nahi." }
   ];
 
-  const filteredOpportunities = opportunities.filter(opp => {
-    const matchesFilter = activeFilter === 'All' || opp.category === activeFilter;
-    const matchesSearch = searchQuery === '' || opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) || opp.company?.toLowerCase().includes(searchQuery.toLowerCase()) || opp.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
-
   return (
-    <div className="grain min-h-screen bg-transparent text-[#FAFAFA] font-sans overflow-x-hidden relative selection:bg-[#E92A39] selection:text-white">
+    <div className="home-page grain min-h-screen bg-transparent text-[#FAFAFA] font-sans overflow-x-hidden relative selection:bg-[#E92A39] selection:text-white">
       <PageOpeningTransition />
       
       {/* GLOBAL BACKGROUND IMAGE WITH BLUR OVERLAY */}
@@ -844,8 +632,16 @@ export default function Home() {
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Kalam:wght@400;700&display=swap');
-        * { font-family: 'Outfit', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap');
+        .home-page, .home-page * { font-family: 'Lato', sans-serif !important; }
+        .home-page h1, .home-page h2, .home-page h3, .home-page h4,
+        .home-page :is(h1,h2,h3,h4) *, .home-page .launch-mantra { font-family: 'Arvo', serif !important; font-weight: 700; }
+        @media(max-width:600px) { .home-page .vault-header h2 strong { font-size: clamp(52px,16vw,76px); } .home-page .vault-title-arrow { left: calc(100% + 12px); } }
+        .home-page .registration-launch .launch-edition { font-size: 14px; }
+        .home-page .registration-launch .launch-mantra { font-size: clamp(24px,2.3vw,36px); line-height: 1.35; }
+
+        .hero-highlight { color: #fff; background: #E92A39; padding: .06em .1em .12em; box-decoration-break: clone; max-width: 100%; overflow-wrap: anywhere; }
+        .home-hero-headline, .home-hero-headline > span { font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: -.045em; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -863,7 +659,7 @@ export default function Home() {
       {/* COUNTDOWN BANNER */}
       <div className="fixed top-0 w-full h-10 bg-[#0A0A0A]/80 backdrop-blur-md text-[#FAFAFA] px-4 md:px-6 text-center text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 md:gap-3 z-[60] border-b border-[#2A2A2E]">
         <span className="text-[#E92A39] animate-pulse">LIVE</span>
-        <span className="hidden sm:inline">Launching this Dussehra in</span> {countdown.days}d {countdown.hours}h {countdown.minutes}m --
+        <span className="hidden sm:inline">Launching this Laxmi Puja in</span> {countdown.days}d {countdown.hours}h {countdown.minutes}m --
         <button data-cta="home-announcement" onClick={goToPreRegister} className="underline hover:text-[#E92A39] transition-colors">Pre-register</button>
       </div>
 
@@ -898,10 +694,10 @@ export default function Home() {
         </div>
 
         <div className="relative z-20 max-w-[1600px] mx-auto flex flex-col px-4 md:px-12 lg:px-20 w-full">
-          <div className="w-full lg:w-4/5 xl:w-3/5">
-            <h1 className="text-4xl md:text-6xl lg:text-[72px] font-extrabold tracking-tight mb-4 md:mb-6 leading-[1.1] md:leading-[1.05] text-[#FAFAFA] flex flex-col items-start min-h-[90px] md:min-h-[160px]">
+          <div className="w-full lg:w-4/5 xl:w-3/4">
+            <h1 className="home-hero-headline text-4xl md:text-6xl lg:text-[72px] font-black tracking-tight mb-4 md:mb-6 leading-[1.1] md:leading-[1.05] text-[#FAFAFA] flex flex-col items-start min-h-[90px] md:min-h-[160px]">
               <span className="block">Duniya ke sabse bade brands ke</span>
-              <span key={`hook-${heroVideoIndex}`} className="text-[#E92A39] block animate-text-fade-up mt-1 md:mt-2">
+              <span key={`hook-${heroVideoIndex}`} className="hero-highlight block animate-text-fade-up mt-1 md:mt-2">
                 {HERO_RED_HOOKS[heroVideoIndex % HERO_RED_HOOKS.length]}
               </span>
             </h1>
@@ -935,7 +731,7 @@ export default function Home() {
             return (
               <ScrollReveal key={i} delay={i * 50} className="min-w-0 h-[280px] md:h-[360px]">
                 <div 
-                  onClick={() => navigate(`/rooms/${ROOM_PATHS[catName]}`)}
+                  onClick={() => navigate('/rooms')}
                   className="relative h-full w-full overflow-hidden group cursor-pointer transition-all duration-500 ease-out md:transform md:-skew-x-6 rounded-2xl md:rounded-2xl border border-[#2A2A2E] hover:border-transparent"
                 >
                   <div className="absolute md:inset-[-20%] md:w-[140%] inset-0 w-full h-full md:transform md:skew-x-6 pointer-events-none">
@@ -967,7 +763,7 @@ export default function Home() {
                       </h4>
                     </div>
 
-                    <Link to={`/rooms/${ROOM_PATHS[catName]}`} onClick={event => event.stopPropagation()} className="md:hidden pointer-events-auto mt-4 inline-flex self-start items-center gap-6 rounded-full bg-white text-black px-5 py-2.5 text-sm font-black">Explore more <span aria-hidden="true">↗</span></Link>
+                    <Link to={'/rooms'} onClick={event => event.stopPropagation()} className="md:hidden pointer-events-auto mt-4 inline-flex self-start items-center gap-6 rounded-full bg-white text-black px-5 py-2.5 text-sm font-black">Explore more <span aria-hidden="true">↗</span></Link>
 
                     {/* Desktop Hover Reveal */}
                     <div className="hidden md:flex opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-500 delay-200 flex-col items-start h-full justify-center w-full">
@@ -978,7 +774,7 @@ export default function Home() {
                         <span>{catName}</span>
                       </h4>
                       <p className="text-white/90 text-sm md:text-base font-semibold mb-6 max-w-[220px] md:max-w-sm leading-relaxed drop-shadow-md">{data.desc}</p>
-                      <Link to={`/rooms/${ROOM_PATHS[catName]}`} onClick={event => event.stopPropagation()} className="pointer-events-auto inline-flex items-center gap-6 rounded-full bg-white text-black px-6 py-3 text-sm font-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">Explore more <span aria-hidden="true">↗</span></Link>
+                      <Link to={'/rooms'} onClick={event => event.stopPropagation()} className="pointer-events-auto inline-flex items-center gap-6 rounded-full bg-white text-black px-6 py-3 text-sm font-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">Explore more <span aria-hidden="true">↗</span></Link>
                     </div>
                   </div>
                 </div>
@@ -1000,8 +796,8 @@ export default function Home() {
         <div className="relative z-10 max-w-[1600px] mx-auto">
           <ScrollReveal>
             <div className="text-center mb-10 md:mb-16">
-              <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-3 md:mb-4">Earn More Than a Certificate</h2>
-              <p className="text-[#A1A1AA] font-bold text-sm md:text-lg max-w-2xl mx-auto px-4">No generic certificates. These are the actual rewards tied to live briefs in the vault right now.</p>
+              <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-3 md:mb-4">Give Your Ideas Something to Show</h2>
+              <p className="text-[#A1A1AA] font-bold text-sm md:text-lg max-w-2xl mx-auto px-4">“Experience hai?” Let your work answer. Explore each brief for confirmed opportunities and selection details.</p>
             </div>
           </ScrollReveal>
 
@@ -1027,165 +823,11 @@ export default function Home() {
 
       </section>
 
-      {/* 5. THE CHALLENGE VAULT (REFINED HOVER ACTION) */}
-      <section data-cta-section="opportunities" id="opportunities" className="py-16 md:py-24 relative overflow-hidden bg-transparent border-b border-[#2A2A2E] scroll-mt-10">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-8">
-          <ScrollReveal>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-8 md:mb-12">
-              <div>
-                <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-2 md:mb-4 text-white">The Challenge Vault</h2>
-                <p className="text-[#A1A1AA] text-sm md:text-base font-bold">Big questions. Brands under wraps. See one you’d love to take on?</p>
-              </div>
-              <div className="flex items-center bg-[#1C1C1E]/80 backdrop-blur-md border border-[#2A2A2E] rounded-full px-4 py-2.5 md:px-5 md:py-3 w-full md:w-[350px]">
-                <Search className="w-4 h-4 md:w-5 md:h-5 text-[#71717A] mr-2 md:mr-3" />
-                <input type="text" placeholder="Search challenges or industries..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-transparent text-sm text-white focus:outline-none w-full placeholder:text-[#71717A]" />
-              </div>
-            </div>
+      <ChallengeVault categoryColors={CATEGORY_COLORS} />
 
-            <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-4 md:pb-6 w-full">
-              {CATEGORY_FILTERS.map(filter => (
-                <button 
-                  key={filter} 
-                  onClick={() => setActiveFilter(filter)} 
-                  className={`whitespace-nowrap px-4 py-1.5 md:px-6 md:py-2 rounded-full text-[10px] md:text-xs font-bold transition-all border ${activeFilter === filter ? 'bg-[#E92A39] border-[#E92A39] text-white' : 'bg-[#151515]/80 backdrop-blur-sm border-[#2A2A2E] text-[#A1A1AA] hover:border-gray-500 hover:text-white'}`}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-          </ScrollReveal>
+      <RegistrationJourney steps={REGISTRATION_STEPS} />
 
-          {isLoadingOpps ? (
-             <div className="text-center py-20 md:py-32 text-[#71717A] font-bold text-xs md:text-sm uppercase tracking-widest">Loading...</div>
-          ) : filteredOpportunities.length === 0 ? (
-            <div className="text-center py-20 md:py-32 border border-[#2A2A2E] rounded-2xl bg-[#151515]/80 backdrop-blur-sm">
-              <p className="text-[#A1A1AA] text-sm font-bold">No matches found in this lane.</p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {filteredOpportunities.map((opp, i) => {
-                const catColor = CATEGORY_COLORS[opp.category] || '#E92A39';
-                return (
-                  <ScrollReveal key={opp.id} delay={(i % 4) * 50}>
-                    <div 
-                      className="relative rounded-[2.5rem] bg-[#161616] border border-[#2A2A2E] h-[540px] flex flex-col overflow-hidden group cursor-pointer shadow-sm"
-                      data-cta={`vault-${opp.id}`} onClick={goToPreRegister}
-                    >
-                      {/* Background Image */}
-                      <img src={opp.bgImage || PLACEHOLDER_BG} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-
-                      {/* Default State (Visible when NOT hovered) */}
-                      <div className="absolute inset-0 z-10 flex flex-col justify-between p-6 md:p-8 transition-opacity duration-500 group-hover:opacity-0">
-                        {/* Top Left Tag */}
-                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white w-fit shadow-sm flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: catColor }}></span>
-                          {opp.category}
-                        </span>
-
-                        {/* Bottom Gradient & Content */}
-                        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent pointer-events-none" />
-                        <div className="relative z-10 w-full mt-auto">
-                           <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-3">{opp.company}</p>
-                           <h4 className="text-3xl font-black text-white mb-4 leading-tight">{opp.title}</h4>
-                           <p className="text-sm leading-relaxed text-white/80 mb-6">{opp.description}</p>
-                           <button className="w-full bg-[#1C1C1E] border border-[#2A2A2E] text-white py-4 rounded-xl text-sm font-black flex justify-center items-center gap-2 shadow-lg backdrop-blur-md">
-                              Count me in ↗
-                           </button>
-                        </div>
-                      </div>
-
-                      {/* Hover Overlay (Dark Blur) */}
-                      <div className="absolute inset-0 bg-black/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-
-                      {/* Hover Content Area (Exactly matching the image) */}
-                      <div className="absolute inset-0 z-20 p-6 md:p-8 flex flex-col opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                        
-                        {/* Top Header */}
-                        <div className="flex justify-between items-start mb-6">
-                          <div className="flex flex-col gap-2">
-                            <div className="flex flex-wrap gap-2">
-                              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/10 border border-white/5 text-white/90 shadow-sm">First drop / Preview</span>
-                              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/10 border border-white/5 text-white/90 shadow-sm">Brand under wraps</span>
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-[#10B981] text-white w-fit shadow-sm">Full brief coming soon</span>
-                          </div>
-                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-md border border-white/5 shadow-sm">↗</div>
-                        </div>
-
-                        {/* Title & Company */}
-                        <h3 className="text-2xl md:text-3xl font-black text-white leading-tight mb-5 drop-shadow-md">{opp.title}</h3>
-                        
-                        <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-5">{opp.company}</p>
-                        <div className="bg-white/5 border border-white/20 rounded-2xl p-5 mb-auto backdrop-blur-sm">
-                          <p className="text-white/90 text-sm font-medium leading-relaxed">{opp.description}</p>
-                        </div>
-
-                        {/* CTA & Desc */}
-                        <button className="w-full bg-[#E92A39] text-white py-4 rounded-xl text-sm font-black flex justify-center items-center gap-2 shadow-lg mb-4 hover:bg-[#ff3b4b] transition-colors mt-6">
-                          I’m in ↗
-                        </button>
-                        <p className="text-[#A1A1AA] text-xs font-medium leading-relaxed">Got a different take? There’s room for it.</p>
-                      </div>
-                    </div>
-                  </ScrollReveal>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      <div className="relative z-10 mt-10 text-center"><PreRegisterCTA label="Count me in" /></div>
-      </section>
-
-      {/* 6. SINGLE MERGED PROCESS VIDEO PLAYER */}
-      <section data-cta-section="inside" id="inside" className="py-16 md:py-28 px-4 md:px-8 max-w-[1600px] mx-auto border-t border-[#2A2A2E] relative overflow-hidden">
-        <ScrollReveal>
-          <div className="max-w-3xl mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-4">
-              Read. Argue. Build.
-              <br />
-              <span className="text-[#A1A1AA]">Submit.</span>
-            </h2>
-
-            <p className="max-w-xl text-base md:text-xl font-bold text-[#A1A1AA]">
-              Brief drops. Group chats blow up. The first draft gets trashed. And then, you build something that actually wins.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <div className="mt-12 w-full h-[400px] md:h-[600px]">
-          <ScrollReveal className="h-full w-full">
-            <figure className="group relative overflow-hidden rounded-[2.5rem] border border-[#2A2A2E] bg-[#161616] h-full w-full shadow-2xl">
-              <CrossfadeVideoPlayer
-                clips={PROCESS_CLIPS}
-                activeIndex={processVideoIndex}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent pointer-events-none" />
-              
-              <figcaption className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 z-10">
-                <h3 key={`label-${processVideoIndex}`} className="font-mono text-2xl md:text-4xl lg:text-5xl font-black tracking-[0.16em] text-[#FAFAFA] animate-text-fade-up mb-8 drop-shadow-lg">
-                  {PROCESS_CLIPS[processVideoIndex].label}
-                </h3>
-                
-                {/* Progress Indicators */}
-                <div className="flex gap-3">
-                  {PROCESS_CLIPS.map((_, idx) => (
-                    <div 
-                      key={idx} 
-                      onClick={() => setProcessVideoIndex(idx)} 
-                      className={`h-2 rounded-full cursor-pointer transition-all duration-500 ease-out ${
-                        processVideoIndex === idx ? 'w-12 md:w-20 bg-[#E92A39] shadow-[0_0_10px_#E92A39]' : 'w-3 bg-white/20 hover:bg-white/40'
-                      }`} 
-                    />
-                  ))}
-                </div>
-              </figcaption>
-            </figure>
-          </ScrollReveal>
-        </div>
-      <div className="relative z-10 mt-10 text-center"><PreRegisterCTA /></div>
-      </section>
-
-      <RegistrationJourney />
+      <WhatIf />
 
       {/* 9. FAQ */}
       <section data-cta-section="home-faq" className="py-16 md:py-24 px-4 md:px-8 bg-transparent border-t border-[#2A2A2E]">
@@ -1208,7 +850,7 @@ export default function Home() {
           <div className="bg-[#1C1C1E]/80 backdrop-blur-md border border-[#2A2A2E] rounded-2xl md:rounded-[3rem] p-8 md:p-20 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-t from-[#E92A39]/10 to-transparent pointer-events-none"></div>
             <h2 className="text-3xl md:text-6xl font-black tracking-tight text-white mb-4 md:mb-6 relative z-10">
-              Vault opens this Dussehra, October 20th.
+              Vault opens this Laxmi Puja, November 8, 2026.
             </h2>
             <p className="text-[#A1A1AA] text-sm md:text-lg font-bold mb-8 md:mb-10 max-w-xl relative z-10">
               Don't miss the first cohort of live briefs. Pre-register to secure early access.

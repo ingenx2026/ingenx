@@ -1,0 +1,62 @@
+/* Registration as a decorated school register. Form behaviour stays in Register.jsx. */
+.registration-page { --paper: #fffdf4; --ink: #282b37; --orange: #b92c42; padding: 32px; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); align-items: start; background-color: #d9d0bf; background-image: radial-gradient(#9f907833 .7px, transparent .7px); background-size: 6px 6px; font-family: 'Outfit', 'Segoe UI', sans-serif; }
+.reg-story, .reg-main { border: 1px solid #c3b39a; background-color: var(--paper); background-image: repeating-linear-gradient(transparent 0 31px, #a6bdd238 31px 32px); box-shadow: 0 14px 40px #33251926; }
+.reg-story { position: sticky; top: 24px; height: auto; min-height: 850px; padding: 32px 34px 24px 74px; color: var(--ink); border: 7px solid #8f283d; border-right: 1px solid #b4a695; border-radius: 12px 0 0 12px; overflow: hidden; }
+.reg-cover-stripes { position: absolute; inset: 0 auto 0 0; width: 32px; background: repeating-linear-gradient(87deg, #bd537b 0 4px, #fff5d8 4px 9px, #72af94 9px 13px, #fff5d8 13px 18px, #e8bf59 18px 22px, #fff5d8 22px 27px, #8b9ecc 27px 31px); opacity: .85; }
+.reg-brand { color: #302b35; font-size: 23px; }
+.reg-brand span { color: #b92c42; }
+.reg-cover-label { margin-top: 24px; width: fit-content; padding: 8px 12px; border: 1px solid #918777; background: #fffaf0; font-size: 10px; font-weight: 700; letter-spacing: .13em; transform: rotate(-2deg); }
+.reg-cover-stickers { position: relative; height: 215px; margin-top: 24px; font-family: 'Segoe Print', 'Comic Sans MS', cursive; }
+.reg-cover-stickers > span { position: absolute; box-shadow: 3px 6px 9px #43342a26; border: 1px solid #5e52693b; }
+.reg-sticker-pink { background: #f3c7d8; padding: 16px 22px; top: 0; left: 8px; transform: rotate(-9deg); font-size: 16px; line-height: 1.5; }
+.reg-sticker-yellow { background: #e6e99b; top: 30px; right: 8px; padding: 8px 24px 16px; transform: rotate(12deg); font-size: 17px; line-height: 1.3; }
+.reg-sticker-grade { background: #d8e7d6; top: 127px; left: 36px; padding: 8px 16px; transform: rotate(-12deg); font-size: 36px; line-height: 1.1; }
+.reg-sticker-grade small { display: block; font-size: 10px; }
+.reg-story-copy { margin: 24px 0; }
+.reg-story-copy .reg-eyebrow { color: #726377; font-size: 9px; margin-bottom: 12px; }
+.reg-story h1 { font-family: 'Segoe Print', 'Comic Sans MS', cursive; font-size: clamp(36px, 4.2vw, 64px); font-weight: 700; letter-spacing: -.06em; line-height: 1.2; margin-bottom: 16px; }
+.reg-story h1 em { color: #9d2942; font-style: normal; text-decoration: underline; text-decoration-color: #d9b53d; text-decoration-thickness: 4px; text-underline-offset: 8px; }
+.reg-story-copy > p:last-child { color: #575460; font-size: 13px; }
+.reg-photo { flex: none; height: 170px; max-height: none; margin-top: 12px; border: 8px solid #fff; border-bottom-width: 32px; box-shadow: 3px 6px 12px #33251926; transform: rotate(3deg); }
+.reg-photo:before { background: #d6bb76ad; width: 105px; transform: rotate(-6deg); }
+.reg-photo img { filter: saturate(.85); }
+.reg-story-bottom { margin-top: 28px; color: #726377; }
+.reg-main { position: relative; padding: 28px clamp(24px, 4vw, 64px) 24px; border-left: 0; border-radius: 0 12px 12px 0; min-height: 850px; background-image: linear-gradient(90deg, #69503a18, transparent 28px), linear-gradient(90deg, transparent 36px, #ce647366 36px 37px, transparent 37px), repeating-linear-gradient(transparent 0 31px, #a6bdd238 31px 32px); }
+.reg-main::before { content: ''; position: absolute; top: 30px; bottom: 30px; left: -8px; width: 16px; background: radial-gradient(ellipse at center, #8b8377 0 3px, #d0c4b2 4px 6px, transparent 7px) center top / 16px 40px repeat-y; pointer-events: none; }
+.reg-top { margin-bottom: 28px; }
+.reg-top > span { background: #f5e7b8; padding: 6px 8px; transform: rotate(2deg); }
+.reg-volunteer { margin-bottom: 20px; }
+.reg-volunteer-toggle { border-radius: 3px; background: #e2e9ce; color: #394e37; border: 1px solid #a5b28e; box-shadow: 2px 3px 0 #a5b28e60; transform: rotate(2deg); }
+.reg-progress { gap: 8px; margin-bottom: 30px; }
+.reg-progress button { position: relative; border: 1px solid #b9afa1; border-bottom: 3px solid #b9afa1; border-radius: 5px 5px 0 0; padding: 12px 9px; background: #f3d4dc; color: #403746; min-height: 54px; }
+.reg-progress button:nth-child(2) { background: #e8e9b8; }
+.reg-progress button:nth-child(3) { background: #d5e5dc; }
+.reg-progress button[aria-current=step] { color: #372a37; border-color: #9d2942; transform: translateY(-4px); box-shadow: 0 5px 0 #9d294218; }
+.reg-progress button span { background: #ffffff90; border-color: #817268; }
+.reg-step-heading h2 { font-family: 'Segoe Print', 'Comic Sans MS', cursive; font-weight: 700; font-size: clamp(30px, 3vw, 44px); letter-spacing: -.055em; }
+.reg-step-heading > p:last-child { color: #5e5662; }
+.registration-page input:not([type=checkbox]):not([type=file]), .registration-page textarea { border: 0; border-bottom: 2px solid #aaa0a1; border-radius: 0; background: #fffdf4c9; padding: 12px 8px; font-size: 15px; color: #263549; }
+.registration-page input::placeholder, .registration-page textarea::placeholder { color: #746e77; }
+.registration-page input:focus, .registration-page textarea:focus { border-bottom-color: #9d2942; box-shadow: 0 3px 0 #9d29421c; background: #fffef8; }
+.reg-cv { border: 1px dashed #ae9c78; border-radius: 1px; background: #f3ebd7; box-shadow: 3px 4px 0 #bba98b33; }
+.reg-cv::before { content: ''; position: absolute; width: 54px; height: 14px; top: -8px; right: 20px; transform: rotate(5deg); background: #d6bb7680; pointer-events: none; }
+.reg-chips button { background: #fffdf4; border-radius: 3px; border-color: #b9aebc; min-height: 44px; font-size: 12px; }
+.reg-chips button[aria-pressed=true] { background: #dce8d2; color: #283e29; border-color: #526a49; box-shadow: inset 0 -3px 0 #526a4929; }
+.reg-primary { border: 2px solid #8e2336; border-radius: 4px; background: #b92c42; box-shadow: 3px 3px 0 #8e233633; letter-spacing: .03em; }
+.reg-primary:hover:not(:disabled) { background: #982035; box-shadow: 4px 4px 0 #8e233633; }
+.reg-note,.reg-bottom-note { color: #635d66; }
+.reg-vault-context { background: #f3e6a9; border: 1px solid #d2c287; border-radius: 2px; box-shadow: 3px 4px 0 #8c76331c; }
+.reg-volunteer-panel { background: #fffdf4; }
+.reg-footer { color: #69616c; }
+@media (max-width: 1050px) { .registration-page { padding: 20px; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); } .reg-story { padding-left: 50px; padding-right: 24px; } .reg-main { padding: 24px 24px 24px 44px; } .reg-cover-stripes { width: 22px; } .reg-sticker-pink { left: 0; font-size: 13px; padding: 12px; } .reg-sticker-yellow { right: 0; font-size: 14px; padding: 10px 14px; } .reg-progress button { flex-wrap: wrap; gap: 6px; font-size: 10px; } }
+@media (max-width: 760px) { .registration-page { display: block; padding: 12px; } .reg-story { position: relative; top: 0; min-height: 0; border: 5px solid #8f283d; border-radius: 10px 10px 0 0; padding: 22px 24px 26px 48px; } .reg-cover-label { margin-top: 16px; font-size: 8px; } .reg-cover-stickers { height: 165px; margin: 22px 0 8px; max-width: 300px; } .reg-sticker-grade { top: 95px; left: 38px; font-size: 28px; } .reg-story-copy { margin: 16px 0 0; } .reg-story h1 { font-size: 38px; } .reg-story h1 br { display: block; } .reg-story h1 em { margin-left: 0; } .reg-main { min-height: 0; padding: 24px 18px 24px 28px; border: 1px solid #c3b39a; border-top: 0; border-radius: 0 0 10px 10px; background-image: linear-gradient(90deg, transparent 16px, #ce647366 16px 17px, transparent 17px), repeating-linear-gradient(transparent 0 31px, #a6bdd238 31px 32px); } .reg-main::before { display: none; } .reg-progress { gap: 5px; } .reg-progress button { padding: 9px 6px; } .reg-top { align-items: flex-start; gap: 8px; } .reg-top > span { font-size: 7px; } .reg-step-heading h2 { font-size: 34px; } .reg-primary { gap: 10px; padding: 12px 15px; } .reg-volunteer-panel { padding: 20px 12px; } }
+
+.register-cover-page { min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 64px 20px 40px; background: #e7dfd0; color: #282b37; font-family: 'Outfit', 'Segoe UI', sans-serif; }
+.register-cover-back { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 28px; color: #49434b; font-size: 13px; text-decoration: none; }
+.register-cover-title { font-size: 14px; font-weight: 600; letter-spacing: .03em; margin: 0 0 24px; text-align: center; }
+.register-cover-open { display: flex; flex-direction: column; align-items: center; max-width: 100%; padding: 0; border: 0; background: transparent; color: #282b37; cursor: pointer; }
+.register-cover-open img { width: min(390px, 76vw); height: auto; display: block; box-shadow: 10px 16px 32px #39251f38; }
+.register-cover-open > span { display: inline-flex; align-items: center; gap: 14px; margin-top: 28px; min-height: 48px; padding: 12px 24px; background: #8f283d; color: white; border-radius: 4px; font-size: 14px; font-weight: 650; }
+.register-cover-hint { margin: 18px 0 0; font-size: 13px; color: #635762; text-align: center; }
+.register-cover-page :focus-visible { outline: 3px solid #8f283d; outline-offset: 7px; }
+@media (max-width: 600px) { .register-cover-page { padding: 24px 16px 32px; } .register-cover-back { margin-bottom: 24px; } }

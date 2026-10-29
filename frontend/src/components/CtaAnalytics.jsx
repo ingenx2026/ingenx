@@ -1,5 +1,6 @@
+import { API_BASE } from '../apiConfig';
 import { useEffect } from 'react';
-const API = (process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337').replace(/\/$/, '');
+const API = API_BASE;
 export default function CtaAnalytics() {
   useEffect(() => {
     const capture = event => {

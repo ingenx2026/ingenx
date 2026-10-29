@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "what_if_questions",
+  "info": {
+    "singularName": "what-if-question",
+    "pluralName": "what-if-questions",
+    "displayName": "What if \u2014 Questions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "dayNumber": {
+      "type": "integer",
+      "required": true,
+      "unique": true,
+      "min": 1,
+      "max": 30
+    },
+    "prompt": {
+      "type": "text",
+      "required": true,
+      "maxLength": 700
+    }
+  }
+}

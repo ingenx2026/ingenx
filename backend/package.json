@@ -1,0 +1,8 @@
+{
+  "name": "ingenuityx-backend-shortcuts",
+  "private": true,
+  "scripts": {
+    "develop": "node ../scripts/start-strapi.cjs",
+    "export:pre-registrations": "npm --prefix ../ingenuityx-backend run export:pre-registrations"
+  }
+}

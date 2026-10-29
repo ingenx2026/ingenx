@@ -1,11 +1,13 @@
 import InternshipDetails from '../components/InternshipDetails';
-import RoomFirstDrop from '../components/RoomFirstDrop';
+import RoomHub from './RoomHub';
 import { useEffect, useRef } from 'react';
 import ingenuityLogo from '../imports/ingenuityx-logo.svg';
 import { Link, useParams } from 'react-router-dom';
 import { ROOMS } from '../data/rooms';
 import './RoomExplore.css';
 import './RoomTheme.css';
+import beverageFridge from '../imports/beverage-fridge.png';
+import './BeverageChallenge.css';
 
 export default function RoomExplore() {
   const { roomSlug } = useParams();
@@ -22,7 +24,7 @@ export default function RoomExplore() {
     let frame = null;
     let observer;
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const elements = [...root.querySelectorAll('.room-card, .room-closing, .room-directory-card, .first-drop-heading, .room-directory-intro, .room-section-heading, .room-hero-copy, .room-hero figure')];
+    const elements = [...root.querySelectorAll('.room-card, .room-closing, .room-directory-card, .first-drop-heading, .room-directory-intro, .room-section-heading, .room-hero-copy, .room-hero figure, .remix-room-row, .remix-rooms-heading, .remix-end')];
     const reveal = element => { element.classList.add('is-revealed'); observer?.unobserve(element); };
     const configureMotion = () => {
       observer?.disconnect();
@@ -66,13 +68,7 @@ export default function RoomExplore() {
     };
   }, [roomSlug]);
   const brand = <Link to="/" className="room-wordmark" aria-label="InGenuityX home"><img src={ingenuityLogo} alt="InGenuityX" /></Link>;
-  if (!roomSlug) return <main className="room-page room-directory" ref={pageRef}>
-    <header className="room-header">{brand}<Link to="/">← Home</Link><Link className="room-join" to="/register" data-cta="rooms-directory-header">Count me in ↗</Link></header>
-    <RoomFirstDrop />
-    <section className="room-directory-intro room-directory-secondary"><p className="room-eyebrow">SIX ROOMS. NO BOXES.</p><h2>Find your vibe.<br /><em>Meet your tribe.</em></h2><p>Follow what pulls you in. There’s more than one way to make your mark.</p></section>
-    <section className="room-directory-grid" aria-label="Choose a room">{ROOMS.map((item, index) => <Link className="room-directory-card" data-room={item.slug} to={`/rooms/${item.slug}`} key={item.slug}><img src={item.image} alt="" loading="lazy" /><div><span className="room-eyebrow">ROOM 0{index + 1}</span><h2>{item.name}</h2><p>{item.headline}</p><span className="room-directory-explore">Explore more ↗</span></div></Link>)}</section>
-    <footer className="room-footer"><span>InGenuityX / Cohort 01</span><Link to="/">Back to home ↗</Link></footer>
-  </main>;
+  if (!roomSlug) return <RoomHub />;
   if (!room) return <main className="room-page room-missing"><h1>This room hasn’t opened yet.</h1><Link to="/rooms">Find your room ↗</Link></main>;
   return <main className="room-page" data-room={room.slug} key={room.slug} ref={pageRef}>
     <header className="room-header">{brand}<Link to="/rooms">← All rooms</Link><Link className="room-join" to="/register" data-cta={`room-${room.slug}-header`}>Count me in <span aria-hidden="true">↗</span></Link></header>
@@ -84,7 +80,11 @@ export default function RoomExplore() {
     <nav className="room-tabs" aria-label="Explore other rooms">{ROOMS.map(item => <Link key={item.slug} to={`/rooms/${item.slug}`} aria-current={item.slug === room.slug ? 'page' : undefined}>{item.name}</Link>)}</nav>
     <section className="room-opportunities" id="room-opportunities">
       <div className="room-section-heading"><div><p className="room-eyebrow">INGENUITYX / FIRST LOOK</p><h2>Something here has your name on it.</h2></div><p>Brands under wraps.<br />Full briefs and details at the reveal.</p></div>
-      <div className="room-grid">{room.briefs.map((brief, index) => <article className={`room-card ${brief.image ? 'room-card-featured' : ''}`} key={brief.title}>
+      <div className="room-grid">{room.briefs.map((brief, index) => room.slug === 'marketing' && brief.sector === 'Beverages / Market disruption' ? <article className="room-card beverage-challenge" key={brief.title}>
+        <div className="beverage-header"><p><span aria-hidden="true" />BEVERAGES / MARKET DISRUPTION</p><span>{String(index + 1).padStart(2, '0')} / {String(room.briefs.length).padStart(2, '0')}</span></div>
+        <div className="beverage-content"><div className="beverage-copy"><h3>Fridge mein<br />jagah hai.<br /><em>Market mein?</em></h3><p>A new beverage brand wants in. Help it stand out in a crowded market and give people a reason to switch.</p></div><img src={beverageFridge} alt="An open lavender fridge filled with drinks, with a bright lime can making its entrance" loading="lazy" /></div>
+        <div className="beverage-footer"><div><span>{brief.format}</span><span>Full brief coming soon</span></div><Link className="room-card-cta" to="/register" data-cta={`room-${room.slug}-brief-${index + 1}`}>Count me in <span aria-hidden="true">↗</span></Link></div>
+      </article> : <article className={`room-card ${brief.image ? 'room-card-featured' : ''}`} key={brief.title}>
         {brief.image && <div className="room-card-image"><img src={brief.image} alt="A glimpse of the InGenuityX challenge experience" loading="lazy" /><span>THE NEXT CHAPTER IS YOURS ↗</span></div>}
         <div className="room-card-body"><div className="room-card-top"><p>{brief.sector}</p><span>{String(index + 1).padStart(2, '0')} / {String(room.briefs.length).padStart(2, '0')}</span></div><h3>{brief.title}</h3><p className="room-description">{brief.description}</p><div className={`room-meta ${brief.internship ? 'room-meta-internship' : ''}`}>{brief.internship ? <InternshipDetails /> : <span>{brief.format}</span>}<span>Full brief coming soon</span></div><Link className="room-card-cta" to="/register" data-cta={`room-${room.slug}-brief-${index + 1}`}>{index === 0 ? 'Get first dibs' : index % 2 ? 'Count me in' : 'I’m in'} <span aria-hidden="true">↗</span></Link></div>
       </article>)}</div>

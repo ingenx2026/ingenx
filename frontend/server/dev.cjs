@@ -1,0 +1,3 @@
+require('dotenv').config({path:'.env.local'});
+const http=require('node:http');const {handler}=require('./handler.cjs');
+http.createServer(async(req,res)=>{let chunks=[],size=0;try{for await(const chunk of req){size+=chunk.length;if(size>40000){res.writeHead(413);res.end('Request too large');return;}chunks.push(chunk);}req.body=chunks.length?JSON.parse(Buffer.concat(chunks)):{};await handler(req,res);}catch{res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Invalid JSON'}}));}}).listen(3002,'127.0.0.1',()=>console.log('Vercel-compatible API: http://localhost:3002'));

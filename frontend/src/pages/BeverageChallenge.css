@@ -1,0 +1,16 @@
+.room-page .room-card.beverage-challenge { grid-column:1 / -1; display:block; padding:28px; border:1px solid #b8a6e6; border-radius:26px; background:#111215; color:#f8f5ef; overflow:hidden; box-shadow:0 16px 64px #0003; }
+.beverage-header { display:flex; justify-content:space-between; align-items:center; gap:20px; color:#c5b6eb; font-size:13px; letter-spacing:.19em; }
+.beverage-header p { display:flex; align-items:center; gap:18px; margin:0; }
+.beverage-header p span { width:16px; height:16px; background:#d3ff49; border-radius:3px; flex-shrink:0; }
+.beverage-header > span { white-space:nowrap; }
+.beverage-content { display:grid; grid-template-columns:1fr 1fr; align-items:center; position:relative; margin:18px 0; }
+.beverage-copy { position:relative; z-index:1; padding:12px 0; }
+.room-page .beverage-challenge h3 { font-family:inherit; color:#faf6ef; font-size:clamp(36px,4vw,56px); font-weight:850; line-height:1.03; letter-spacing:-.05em; margin:0 0 20px; }
+.room-page .beverage-challenge h3 em { color:#d3ff49; font-style:normal; white-space:nowrap; }
+.beverage-copy > p { color:#b9b5c7; font-size:clamp(15px,1.3vw,18px); line-height:1.55; max-width:530px; margin:0; }
+.beverage-content > img { width:100%; max-width:none; height:360px; margin-left:0; object-fit:contain; mix-blend-mode:screen; mask-image:linear-gradient(90deg,transparent,#000 12%,#000 92%,transparent); }
+.beverage-footer { border-top:1px solid #b5abc777; padding-top:14px; position:relative; }
+.beverage-footer > div { display:flex; justify-content:space-between; gap:16px; color:#c5b6eb; font-size:13px; letter-spacing:.1em; margin-bottom:16px; }
+.room-page .beverage-challenge .room-card-cta { background:#faf6ef; color:#111215; border:0; border-radius:14px; display:inline-flex; align-items:center; gap:28px; padding:13px 22px; font-size:16px; font-weight:700; box-shadow:none; }
+.room-page .beverage-challenge .room-card-cta:hover { background:#d3ff49; }
+@media(max-width:700px) { .room-page .room-card.beverage-challenge { padding:24px 20px; border-radius:20px; } .beverage-header { font-size:9px; letter-spacing:.1em; gap:12px; } .beverage-header p { gap:9px; } .beverage-header p span { width:12px; height:12px; } .beverage-content { grid-template-columns:1fr; margin:24px 0 16px; } .room-page .beverage-challenge h3 { font-size:clamp(36px,9vw,60px); } .beverage-copy { padding:0; } .beverage-copy > p { font-size:16px; } .beverage-content > img { width:100%; height:240px; margin:10px 0 0; aspect-ratio:1.2; object-fit:contain; } .beverage-footer > div { font-size:10px; letter-spacing:.04em; } .room-page .beverage-challenge .room-card-cta { font-size:16px; padding:15px 23px; } }

@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "what_if_answers",
+  "info": {
+    "singularName": "what-if-answer",
+    "pluralName": "what-if-answers",
+    "displayName": "What if \u2014 Answers"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "displayName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "answer": {
+      "type": "text",
+      "required": true,
+      "maxLength": 2000
+    },
+    "questionDay": {
+      "type": "date",
+      "required": true
+    },
+    "questionNumber": {
+      "type": "integer",
+      "required": true
+    },
+    "questionText": {
+      "type": "text",
+      "required": true
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "consentAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "requestId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "private": true
+    },
+    "email": {
+      "type": "email",
+      "private": true
+    }
+  }
+}

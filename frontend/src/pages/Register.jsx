@@ -1,11 +1,15 @@
+import { API_BASE } from '../apiConfig';
+import VolunteerRegistration from '../components/VolunteerRegistration';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { VAULT_TEASERS } from '../data/vaultPreviews';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowUpRight, ArrowLeft, ArrowRight, Check, Upload, X, Clock, LoaderCircle } from 'lucide-react';
+import ingenuityLogo from '../imports/ingenuityx-logo.svg';
 import finaleImage from '../imports/step 4.jpg';
 import './Register.css';
 
-const API_URL = (process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337').replace(/\/$/, '');
+const API_URL = API_BASE;
 const INTERESTS = ['Marketing', 'Hackathons', 'Sustainability', 'Design', 'Innovation', 'Content & creation'];
 const OPPORTUNITIES = ['Job', 'Internship', 'Paid project', 'Side project', 'PPO'];
 const SKILLS = ['Writing', 'Coding', 'Design', 'Research', 'Social media', 'Presenting', 'Video editing', 'Problem solving'];
@@ -23,6 +27,8 @@ function ChoiceGroup({ title, description, options, selected, onChange, error, i
 }
 
 export default function Register() {
+  const location = useLocation();
+  const selectedChallenge = VAULT_TEASERS.find(challenge => challenge.id === location.state?.selectedChallengeId);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(INITIAL);
   const [cv, setCv] = useState(null);
@@ -41,6 +47,7 @@ export default function Register() {
   const heading = useRef(null);
   const fileInput = useRef(null);
   const requestId = useRef(null);
+  const resumeUpload = useRef(null);
   const sending = useRef(false);
   useEffect(() => { document.title = 'Pre-register | InGenuityX'; return () => { document.title = 'InGenuityX'; }; }, []);
   useEffect(() => {
@@ -111,23 +118,27 @@ export default function Register() {
     }
     sending.current = true; setStatus('sending'); setErrors({});
     try {
-      let resume = null;
-      if (cv) {
-        const base64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1]); reader.onerror = () => reject(new Error('file')); reader.readAsDataURL(cv);
-        });
-        resume = { name: cv.name, content: base64 };
-      }
       requestId.current ||= crypto.randomUUID();
+      let resume = null;
+      if (cv && resumeUpload.current?.file === cv && resumeUpload.current?.email === form.email.trim().toLowerCase() && resumeUpload.current.expiresAt > Date.now()) { resume = resumeUpload.current.resume; }
+      else if (cv) {
+        const { data: upload } = await axios.post(`${API_URL}/api/cv-upload`, { name: cv.name, size: cv.size, email: form.email.trim(), requestId: requestId.current, website: form.website });
+        const uploaded = await fetch(upload.uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'application/pdf' }, body: cv });
+        if (!uploaded.ok) throw new Error('CV upload failed');
+        resume = { name: cv.name, ticket: upload.ticket };
+        resumeUpload.current = { file: cv, email: form.email.trim().toLowerCase(), resume, expiresAt: Date.now() + 110 * 60 * 1000 };
+      }
       const response = await axios.post(`${API_URL}/api/pre-registrations`, { ...form, name: form.name.trim(), email: form.email.trim().toLowerCase(), college: form.college.trim(), about: form.about.trim(), resume, requestId: requestId.current }, { timeout: 180000 });
       if (!response.data?.reference) throw new Error('Unexpected response');
       setReceipt(response.data.reference); setConfirmationOpen(true); setCv(null); setForm(INITIAL); setStatus('success');
     } catch (error) {
       setStatus('error');
       const code = error.response?.status;
+      if (code === 400 || code === 409) { resumeUpload.current = null; requestId.current = null; }
       const message = code === 429 ? 'A few too many attempts. Please try again in 15 minutes.'
         : code === 413 ? 'Your CV is too large. Choose a PDF up to 5 MB.'
         : code === 400 ? 'Please check your details and PDF, then try again.'
+        : code === 409 ? 'Your details changed. Please submit again to save this version.'
         : !error.response ? 'We couldn’t connect. Please check your connection and try again. Your answers are still here.'
         : 'Registration is temporarily unavailable. Your answers are still here. Please try again shortly.';
       setErrors({ submit: message });
@@ -136,14 +147,16 @@ export default function Register() {
   const customSkills = form.skills.filter(value => !SKILLS.includes(value));
   return <main className="registration-page">
     <aside className="reg-story">
-      <Link className="reg-brand" to="/">InGenuity<span>×</span></Link>
-      <div className="reg-story-copy"><p className="reg-eyebrow">COHORT 01 / OCT 2026</p><h1>Good ideas <br />need a <br /><em>way in.</em></h1><p>This is yours. Find your people.<br />Build something that gets noticed.</p></div>
+      <Link className="reg-brand" to="/" aria-label="InGenuityX home"><img src={ingenuityLogo} alt="InGenuityX" /></Link>
+      <div className="reg-story-copy"><p className="reg-eyebrow">COHORT 01 / NOV 2026</p><h1>Good ideas <br />need a <br /><em>way in.</em></h1><p>This is yours. Find your people.<br />Build something that gets noticed.</p></div>
       <div className="reg-photo"><img src={finaleImage} alt="Students presenting their ideas on the InGenuityX stage" /><span>YOUR NEXT CHAPTER, IN REAL LIFE. ↗</span></div>
       <div className="reg-story-bottom"><span>DARE → DISCOVER → DO</span><span>01 / FIRST MOVERS</span></div>
     </aside>
     <section className="reg-main" aria-label="Pre-registration">
+      <VolunteerRegistration />
       <header className="reg-top"><Link to="/"><ArrowLeft size={15} /> Back to the room</Link><span><Clock size={14} /> ABOUT 60 SECONDS</span></header>
       {receipt ? <div className="reg-success"><span className="reg-success-icon"><Check size={40} /></span><p className="reg-eyebrow" role="status">PRE-REGISTRATION SUCCESSFUL</p><h2 ref={heading} tabIndex={-1}>You’re<br /><em>pre-registered!</em></h2><p>Your profile has been saved successfully. You’re on the list for Cohort 01. We’ll use your email to contact you about relevant opportunities.</p><div className="reg-receipt">YOUR REFERENCE<strong>{receipt}</strong></div><Link className="reg-primary" to="/">Explore the rooms <ArrowUpRight size={20} /></Link></div> : <>
+        {selectedChallenge && <aside className="reg-vault-context" aria-label="Selected challenge preview"><p>PRE-REGISTRATION / CHALLENGE PREVIEW</p><strong>{selectedChallenge.title}</strong><span>You’re pre-registering your profile. The full brief is coming soon.</span></aside>}
         <nav className="reg-progress" aria-label="Registration progress">{STEPS.map((label, index) => <button type="button" key={label} disabled={index > step || status === 'sending'} aria-current={index === step ? 'step' : undefined} onClick={() => { setStep(index); setErrors({}); }}><span>{index < step ? <Check size={13} /> : `0${index + 1}`}</span>{label}</button>)}</nav>
         <form onSubmit={submit} noValidate>
           {slowRequest && <p role="status" className="reg-note">Our registration server is waking up. This can take a minute or two. Please keep this page open; your answers are still here.</p>}

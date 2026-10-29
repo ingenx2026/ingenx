@@ -1,0 +1,1 @@
+Original Home.jsx before anonymous Challenge Vault teasers is saved beside this file. This archive is outside src and is not rendered. Restore the Vault JSX and fetchPlatformData() call from this snapshot when ready to reveal brands; do not replace unrelated later page changes. Current preview copy is in VAULT_TEASERS in src/pages/Home.jsx.

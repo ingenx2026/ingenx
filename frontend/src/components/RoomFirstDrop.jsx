@@ -8,7 +8,7 @@ function Join({ source, children = 'I’m in' }) {
 }
 export default function RoomFirstDrop() {
   return <section className="room-first-drop" aria-labelledby="first-drop-title">
-    <header className="first-drop-heading"><div><p className="drop-kicker"><span aria-hidden="true">✳</span> INGENUITYX / OPPORTUNITY EDIT</p><h1 id="first-drop-title">THE FIRST <span>DROP.</span></h1><p className="drop-intro">A fresh brief. A different take. Your next move.</p></div><span>NOV ’26</span></header>
+    <header className="first-drop-heading"><div><p className="drop-kicker"><span aria-hidden="true">✳</span> INGENUITYX / OPPORTUNITY EDIT</p><h2 id="first-drop-title">THE FIRST <span>DROP.</span></h2><p className="drop-intro">A fresh brief. A different take. Your next move.</p></div><span>NOV ’26</span></header>
     <div className="drop-index" aria-hidden="true"><span>01 — THE BRIEFS</span><span>SCROLL TO FIND YOUR NEXT MOVE ↓</span></div>
     <div className="first-drop-grid">
       <article className="room-card first-drop-card">

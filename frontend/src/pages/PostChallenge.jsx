@@ -1,3 +1,4 @@
+import { API_BASE } from '../apiConfig';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -29,7 +30,7 @@ export default function PostChallenge() {
 
     try {
       // Note: Strapi requires custom collection data to be wrapped in a "data" object!
-      await axios.post('http://localhost:1337/api/challenges', {
+      await axios.post(`${API_BASE}/api/challenges`, {
         data: formData
       });
       

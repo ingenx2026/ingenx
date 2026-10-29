@@ -1,3 +1,4 @@
+import { API_BASE } from '../../apiConfig';
 import heroImage2 from '../imports/image-4.png';
 import heroImage3 from '../imports/image-5.png';
 import registeredImage from '../imports/image-1.png';
@@ -17,7 +18,7 @@ import ingenxLogo from '../imports/ingenx.png';
 import nuvocoLogo from '../imports/logo_nuvoco.jpg';
 import srmbLogo from '../imports/srmb.jpg';
 
-export const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
+export const API_URL = API_BASE;
 export const PLACEHOLDER_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop";
 
 export const heroSlides = [

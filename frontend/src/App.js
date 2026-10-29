@@ -1,3 +1,4 @@
+import Admin from './pages/Admin';
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "@/pages/Home";
@@ -24,6 +25,7 @@ function App() {
         <ScrollToTop />
         <CtaAnalytics />
         <Routes>
+          <Route path="/admin" element={<Admin />} />
           <Route path="/" element={<Home />} />
           <Route path="/rooms" element={<RoomExplore />} />
           <Route path="/rooms/:roomSlug" element={<RoomExplore />} />

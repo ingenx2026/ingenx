@@ -1,3 +1,4 @@
+import { API_BASE } from '../apiConfig';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -21,7 +22,7 @@ import ingenxPosterBg from '../imports/IngenX (2).png';
 import evereadyBg from '../imports/eveready.png';
 
 // --- ENVIRONMENT VARIABLE SETUP ---
-const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
+const API_URL = API_BASE;
 
 export default function OpportunityDetails() {
   const { id } = useParams();
@@ -352,12 +353,9 @@ export default function OpportunityDetails() {
     setErrorMsg('');
 
     try {
-      // If applying to the dummy challenge, just simulate a successful save
-      if (challenge.id.startsWith("dummy-")) {
-        setTimeout(() => {
-          setApplySuccess(true);
-          setIsApplying(false);
-        }, 1500);
+      if (challenge.id.startsWith('dummy-')) {
+        setErrorMsg('This is a preview. Pre-register your profile to hear when the full brief opens.');
+        setIsApplying(false);
         return;
       }
 

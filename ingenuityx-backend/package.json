@@ -15,7 +15,8 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
     "export:pre-registrations": "node scripts/export-pre-registrations.cjs",
     "test:pre-registrations": "node scripts/pre-registration.test.cjs",
-    "test:student-dashboard": "npm run build && node scripts/student-dashboard.test.cjs"
+    "test:student-dashboard": "npm run build && node scripts/student-dashboard.test.cjs",
+    "test:what-if": "node scripts/what-if.test.cjs"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.48.1",

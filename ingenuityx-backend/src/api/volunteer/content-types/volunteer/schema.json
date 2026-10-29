@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "volunteers",
+  "info": {
+    "singularName": "volunteer",
+    "pluralName": "volunteers",
+    "displayName": "Volunteer registrations"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "required": true,
+      "private": true
+    },
+    "location": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "acknowledgements": {
+      "type": "json",
+      "required": true,
+      "private": true
+    },
+    "consentVersion": {
+      "type": "string",
+      "required": true
+    },
+    "consentAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "requestId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "private": true
+    },
+    "reference": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    }
+  }
+}

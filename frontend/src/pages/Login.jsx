@@ -1,10 +1,11 @@
+import { API_BASE } from '../apiConfig';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logoImage from '../imports/ingenuityx-logo.svg'; 
 
 // --- ENVIRONMENT VARIABLE SETUP ---
-const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:1337';
+const API_URL = API_BASE;
 
 export default function Login() {
   const navigate = useNavigate();
