@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { VAULT_TEASERS } from '../data/vaultPreviews';
@@ -11,6 +11,7 @@ export default function ChallengeVault({ categoryColors }) {
   const stage = useRef(null);
   const expandingImage = useRef(null);
   const busy = useRef(false);
+  const advance = useRef(null);
   const [transition, setTransition] = useState(null);
   const active = VAULT_TEASERS[activeIndex];
   const orderedChallenges = Array.from({ length: VAULT_TEASERS.length }, (_, offset) => {
@@ -39,7 +40,7 @@ export default function ChallengeVault({ categoryColors }) {
       window.removeEventListener('resize', onResize);
     };
   }, [transition]);
-  const select = index => {
+  const select = useCallback(index => {
     const nextIndex = (index + VAULT_TEASERS.length) % VAULT_TEASERS.length;
     if (busy.current || nextIndex === activeIndex) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -57,7 +58,16 @@ export default function ChallengeVault({ categoryColors }) {
     busy.current = true;
     setTransition({ index: nextIndex, x: (visible ? bounds.left : railBounds.left + 5) - frame.left,
       y: bounds.top - frame.top, width: bounds.width, height: bounds.height });
-  };
+  }, [activeIndex]);
+  useEffect(() => {
+    advance.current = () => select(activeIndex + 1);
+  }, [activeIndex, select]);
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (!document.hidden) advance.current?.();
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, []);
   const failImage = id => setFailedImages(previous => ({ ...previous, [id]: true }));
   return <section id="opportunities" data-cta-section="opportunities" className="challenge-vault" aria-labelledby="vault-heading">
     <div className="vault-container">
