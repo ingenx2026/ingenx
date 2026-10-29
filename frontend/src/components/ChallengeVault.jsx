@@ -65,7 +65,7 @@ export default function ChallengeVault({ categoryColors }) {
   useEffect(() => {
     const timer = window.setInterval(() => {
       if (!document.hidden) advance.current?.();
-    }, 4000);
+    }, 2500);
     return () => window.clearInterval(timer);
   }, []);
   const failImage = id => setFailedImages(previous => ({ ...previous, [id]: true }));
