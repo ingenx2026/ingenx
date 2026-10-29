@@ -1,5 +1,11 @@
 const { fail } = require('./validation.cjs');
-function config() { const url=process.env.SUPABASE_URL?.replace(/\/$/,''); const key=process.env.SUPABASE_SERVICE_ROLE_KEY; if(!url||!key||!process.env.UPLOAD_SIGNING_SECRET) fail(503,'Service setup is incomplete. Please try later.'); return {url,key}; }
+function config() {
+ const required=['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','UPLOAD_SIGNING_SECRET'];
+ const missing=required.filter(name=>!process.env[name]?.trim());
+ // Report names only: never return or log credentials, tokens, or their values.
+ if(missing.length) fail(503,`Deployment configuration missing: ${missing.join(', ')}. Set these for this deployment's environment and redeploy.`);
+ return {url:process.env.SUPABASE_URL.trim().replace(/\/$/,''),key:process.env.SUPABASE_SERVICE_ROLE_KEY.trim()};
+}
 async function request(path, {method='GET',body,headers={},raw=false}={}) {
  const {url,key}=config();
  const response=await fetch(url+path,{method,headers:{apikey:key,Authorization:`Bearer ${key}`,...(body!==undefined?{'Content-Type':'application/json'}:{}),...headers},body:body===undefined?undefined:(Buffer.isBuffer(body)?body:JSON.stringify(body)),signal:AbortSignal.timeout(20000)});

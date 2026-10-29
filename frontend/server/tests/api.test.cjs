@@ -14,6 +14,21 @@ async function invoke(path,method='GET',body={},headers={}) {
 }
 const id='527b175d-ef18-4fba-a824-d5e4870a5521';
 const student={requestId:id,name:'Test Student',email:'TEST@example.com',college:'College',interests:['Marketing'],opportunities:['Internship'],skills:['Writing'],about:'A student exploring creative work.',consent:true};
+test('configuration identifies missing names without exposing secret values',async()=>{
+ const names=['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','UPLOAD_SIGNING_SECRET'];
+ const original=Object.fromEntries(names.map(name=>[name,process.env[name]]));
+ global.fetch=()=>{throw Error('Configuration failure must precede database access');};
+ try {
+  for(const name of names){
+   process.env[name]='   ';
+   const res=await invoke('health');
+   assert.equal(res.statusCode,503);
+   assert.ok(res.body.error.message.includes(name));
+   for(const value of Object.values(original))assert.equal(res.body.error.message.includes(value),false);
+   process.env[name]=original[name];
+  }
+ } finally {for(const name of names)process.env[name]=original[name];}
+});
 test('India midnight and repeating 30-day schedule',()=>{
  assert.equal(V.indiaDay(new Date('2026-10-28T18:29:59Z')),'2026-10-28');
  assert.equal(V.indiaDay(new Date('2026-10-28T18:30:00Z')),'2026-10-29');
