@@ -60,3 +60,21 @@ Existing Strapi/SQLite records and CVs are NOT automatically transferred. That d
 Private saved CVs are under `saved/`. Abandoned uploads are under `pending/`: periodically delete pending objects older than one day through Supabase Storage. Never delete the saved folder. Admin deletion removes the associated saved CV. Keep backups/exports according to your retention needs.
 
 Local tests use mocked Supabase responses. Actual credentials, database schema and Storage must pass the live verification above before production use.
+
+## Add another administrator
+
+Each administrator uses their own Supabase Auth account. In Supabase Authentication > Users, create a user with a confirmed email and password (or use an existing account). Then run the following in SQL Editor, replacing the email:
+
+```sql
+insert into public.ix_admins(user_id)
+select id from auth.users where lower(email) = lower('new-admin@example.com')
+on conflict do nothing;
+
+select u.email from public.ix_admins a
+join auth.users u on u.id = a.user_id
+where lower(u.email) = lower('new-admin@example.com');
+```
+
+The final query must return that email. If it returns no rows, check that the Auth user exists and the email matches. The new admin can sign in at your website's /admin. No redeploy or schema changes are required. All allowlisted admins have the same access to submissions, private CVs, moderation, exports and deletion. Give access only to trusted team members; they do not need your service_role key.
+
+To revoke access, remove that person's row from ix_admins in Supabase Table Editor. Keep your own row. Their next admin API request will be denied even if their login session has not expired.
