@@ -15,7 +15,7 @@ async function request(path, {method='GET',body,headers={},raw=false}={}) {
  const value=await response.text(); return value?JSON.parse(value):null;
 }
 const db=(path,options)=>request('/rest/v1/'+path,options);
-async function user(token) { if(!token) fail(401,'Sign in to continue.'); const {url,key}=config(); const r=await fetch(url+'/auth/v1/user',{headers:{apikey:key,Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(10000)}); if(!r.ok) fail(401,'Your session expired. Sign in again.'); return r.json(); }
+async function user(token) { if(!token) fail(401,'Sign in to continue.'); const {url,key}=config(); const r=await fetch(url+'/auth/v1/user',{headers:{apikey:key,Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(10000)}); if(r.status===401||r.status===403) fail(401,'Your session expired. Sign in again.'); if(!r.ok) fail(503,'Sign-in service is temporarily unavailable. Please retry.'); return r.json(); }
 async function admin(token) { const u=await user(token); const rows=await db('ix_admins?user_id=eq.'+encodeURIComponent(u.id)+'&select=user_id'); if(!rows.length) fail(403,'Administrator access required.'); return u; }
 const objectPath=p=>p.split('/').map(encodeURIComponent).join('/');
 async function removeFiles(paths) { if(paths.length) await request('/storage/v1/object/cvs',{method:'DELETE',body:{prefixes:paths}}); }

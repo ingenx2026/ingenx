@@ -80,3 +80,9 @@ test('CV ticket is bound to submission identity',async()=>{
  const ticket=V.sign({path:'pending/'+id+'.pdf',requestId:id,email:'another@example.com',exp:Date.now()+10000});
  assert.equal((await invoke('pre-registrations','POST',{...student,resume:{name:'cv.pdf',ticket}})).statusCode,400);
 });
+test('temporary auth outage is not reported as an expired session',async()=>{
+ global.fetch=async()=>new Response('{}',{status:503});
+ assert.equal((await invoke('admin/me','GET',{}, {authorization:'Bearer test-session'})).statusCode,503);
+ global.fetch=async()=>new Response('{}',{status:401});
+ assert.equal((await invoke('admin/me','GET',{}, {authorization:'Bearer test-session'})).statusCode,401);
+});
