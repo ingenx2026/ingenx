@@ -665,18 +665,18 @@ export default function Home() {
 
       {/* NAVBAR */}
       <nav className={`fixed top-10 w-full z-50 px-4 md:px-12 py-3 md:py-4 flex items-center justify-between transition-all duration-300 ${isScrolled ? 'bg-[#0A0A0A]/95 backdrop-blur-md border-b border-[#2A2A2E] shadow-sm' : 'bg-gradient-to-b from-black/80 to-transparent pt-6 md:pt-4'}`}>
-        <div className="w-auto md:w-48 flex justify-start">
+        <div className="w-auto flex items-center gap-3 md:gap-5">
           <Link to="/" className="hover:opacity-80 transition-opacity flex items-center">
-            <img src={logoImage} alt="InGenuityX" className={`w-auto object-contain transition-all duration-300 ${isScrolled ? 'h-6 md:h-8' : 'h-8 md:h-10'}`} />
+            <img src={logoImage} alt="InGenuityX" className={`w-auto max-w-[96px] md:max-w-none object-contain transition-all duration-300 ${isScrolled ? 'h-6 md:h-8' : 'h-8 md:h-10'}`} />
           </Link>
+          <Link to="/for-brands" data-cta="home-brands-navigation" className="text-[10px] md:text-xs font-bold whitespace-nowrap border border-white/30 rounded-full px-3 py-2 text-white hover:bg-white/10">For brands</Link>
         </div>
         <div className={`hidden md:flex items-center justify-center gap-10 text-sm font-bold tracking-wide transition-colors duration-300 flex-1 ${isScrolled ? 'text-[#A1A1AA]' : 'text-white/90'}`}>
           <a href="#opportunities" className="hover:text-[#FAFAFA] transition-colors">Opportunities</a>
-          <Link to="/for-brands" className="hover:text-[#FAFAFA] transition-colors">For Brands</Link>
           <Link to="/about" className="hover:text-[#FAFAFA] transition-colors">About Us</Link>
         </div>
         <div className="w-auto md:w-48 flex justify-end">
-          <button data-cta="home-navigation" onClick={goToPreRegister} className="bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-5 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm shadow-sm transition-colors">
+          <button data-cta="home-navigation" onClick={goToPreRegister} className="bg-[#E92A39] hover:bg-[#ff3b4b] text-white px-3 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm shadow-sm transition-colors">
             Pre-register
           </button>
         </div>
@@ -859,6 +859,13 @@ export default function Home() {
             </button>
           </div>
         </ScrollReveal>
+      </section>
+
+      <section data-cta-section="home-brands" className="max-w-[1600px] mx-auto px-6 md:px-12 pb-16 md:pb-24">
+        <div className="border border-[#d8c7ee]/30 bg-[#1b1820] rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div><p className="text-[#d8c7ee] text-xs font-bold uppercase tracking-widest mb-4">For the brands with a question</p><h2 className="text-white text-3xl md:text-4xl font-bold mb-3">Your challenge. A fresh perspective.</h2><p className="text-[#aaa6b1] max-w-xl">Bring a business brief to InGenuityX—or start with an internal pilot for your team.</p></div>
+          <Link to="/for-brands" data-cta="home-brands-bottom" className="shrink-0 bg-[#d8c7ee] text-[#18151d] px-7 py-4 rounded-full font-bold hover:bg-[#e6daf5]">Explore InGenuityX for brands</Link>
+        </div>
       </section>
 
       {/* FOOTER */}

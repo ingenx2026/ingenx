@@ -13,7 +13,8 @@ import Register from './pages/Register';
 import PostChallenge from './pages/PostChallenge';
 import Login from './pages/Login';
 import About from './pages/About'; 
-import Contact from './pages/Contact'; 
+import Contact from './pages/Contact';
+import ForBrands from './pages/ForBrands'; 
 
 import RoomExplore from './pages/RoomExplore';
 import CtaAnalytics from './components/CtaAnalytics';
@@ -41,7 +42,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           
           {/* 👇 ADD THIS EXACT ROUTE 👇 */}
-          <Route path="/for-brands" element={<Contact />} />
+          <Route path="/for-brands" element={<ForBrands />} />
           
           <Route path="/login" element={<Login />} />
         </Routes>
