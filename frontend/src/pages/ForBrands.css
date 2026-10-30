@@ -23,3 +23,12 @@
 @media(max-width:1000px){.brands-outcomes{gap:35px}.brands-photo-collage{height:380px}.brands-photo-main img{height:180px}.brands-photo-detail img{height:135px}.brands-collage-sticker{font-size:11px;padding:14px 35px 14px 12px}.brands-outcomes-copy h2{font-size:30px}}
 @media(max-width:800px){.brands-hero{padding-left:24px;padding-right:24px;padding-bottom:85px}.brands-film-shade{background:linear-gradient(90deg,#101113c9,#1011138c),linear-gradient(0deg,#101113,transparent 65%)}.brands-hero-orbits{width:100%;height:50%;top:43%}.brands-film-toggle{left:24px;bottom:15px}.brands-outcomes{grid-template-columns:1fr;gap:50px;padding-top:55px;padding-bottom:60px}.brands-photo-collage{max-width:500px;width:100%;height:380px;margin:auto}.brands-outcomes-copy{max-width:500px;margin:auto;width:100%}.brands-photo-main img{height:200px}.brands-photo-detail img{height:145px}.brands-pilot-doodle{left:auto;right:10px;bottom:auto;top:25px;width:85px;opacity:.4}.brands-enquiry-camera{width:220px;margin-top:20px}}
 @media(prefers-reduced-motion:reduce){.brands-offer:before{display:none}.brands-enquiry-camera:hover{transform:none}.brands-page .brands-vectors{transform:none}.brands-film video{opacity:.4}}
+
+/* Quiet navigation with clear typography. */
+.brands-nav-tag{display:block;padding:0 0 0 22px;border:0;border-left:1px solid #ffffff26;border-radius:0;background:none;color:#d0d0d3;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;white-space:nowrap}
+.brands-nav-students{padding:10px 0;color:#d0d0d3;font-size:14px;font-weight:400;white-space:nowrap;transition:color .2s}
+.brands-nav-students:hover,.brands-nav-students:focus-visible{color:#fff}
+.brands-nav .brands-button-small{padding:12px 20px;border-radius:7px;font-size:14px;font-weight:700;gap:15px;box-shadow:none;white-space:nowrap}
+.brands-nav .brands-button-small:hover{transform:none;background:#e1ff86}
+@media(max-width:800px){.brands-nav-tag{display:none}.brands-nav-students{font-size:13px}.brands-nav .brands-button-small{font-size:13px;padding:11px 14px;gap:10px}}
+@media(max-width:480px){.brands-nav{padding:16px;gap:10px}.brands-nav img{width:105px}.brands-nav-students{font-size:12px}.brands-nav .brands-button-small{padding:11px 12px;font-size:12px;gap:7px}}

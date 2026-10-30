@@ -74,7 +74,7 @@ export default function ForBrands() {
     finally { sending.current = false; }
   }
   return <div className="brands-page">
-    <nav className="brands-nav" aria-label="Brand navigation"><Link to="/" aria-label="InGenuityX home"><img src={logo} alt="InGenuityX" /></Link><span className="brands-nav-tag">FOR BRANDS</span><Link className="brands-nav-students" to="/">For students</Link><a href="#brand-enquiry" data-cta="brands-nav" className="brands-button brands-button-small">Let’s talk <ArrowUpRight size={16} /></a></nav>
+    <nav className="brands-nav" aria-label="Brand navigation"><Link to="/" aria-label="InGenuityX home"><img src={logo} alt="InGenuityX" /></Link><span className="brands-nav-tag">For Brands</span><Link className="brands-nav-students" to="/">For students</Link><a href="#brand-enquiry" data-cta="brands-nav" className="brands-button brands-button-small">Let’s talk <ArrowUpRight size={16} /></a></nav>
     <main>
       <section className="brands-hero" data-cta-section="brands-hero">
         <BackgroundFilm reduced={reduceMotion}/>
